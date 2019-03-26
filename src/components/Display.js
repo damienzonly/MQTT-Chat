@@ -17,6 +17,12 @@ export default class Display extends Component {
         event.preventDefault();
         console.log("Subbed to:", this.state.subTarget);
     }
+    keyPress = event => {
+        console.log(event.key, event.keyCode)
+        if (event.keyCode === 13) {
+            this.sub(event);
+        }
+    }
     pushMessage = message => {
         if (message === "") return;
         let messagesCopy = [...this.state.messages];
@@ -45,20 +51,17 @@ export default class Display extends Component {
         });
     }
     render() {
-        let items = this.state.messages.map(message => <li key={message.index}>{message.message}</li>);
+        let items = this.state.messages.map(message => <li className="list-group-item text-right border-0" key={message.index}>{message.message}</li>);
         return (
             <>
-                <form className="form-inline">
-                    <div className="form-group">
-                        <input type="text" onChange={this.subOnChange} placeholder="Sub to user" className="form-control" />
-                        <button onClick={this.sub} type="submit" className="btn btn-outline-primary ml-2">
-                            Submit
-                        </button>
+                <div className="form-inline">
+                    <div className="form-group w-100">
+                        <input type="text" onChange={this.subOnChange} onKeyDown={this.keyPress} placeholder="Sub to user" className="form-control w-100" value={this.state.subTarget} />
                     </div>
-                </form>
+                </div>
                 
                 <div key="display" className="">
-                    <ul>{items}</ul>
+                    <ul className="list-group">{items}</ul>
                     <ChatWindow pm={this.pushMessage} />
                 </div>
             </>
