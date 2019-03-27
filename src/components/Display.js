@@ -26,7 +26,7 @@ export default function Display(props) {
                 </div>
             </div>
             <div className="form-inline">
-                <div className="form-group w-100 mt-2">
+                <div className="form-group w-100 mt-2 mb-2">
                     <input
                         type="text"
                         value={props.subTarget}
