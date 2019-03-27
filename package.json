@@ -3,12 +3,13 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "mosca": "^2.8.3",
+    "aedes": "^0.37.0",
     "mqtt": "^2.18.8",
     "mqtt-react": "0.0.3",
     "react": "^16.8.5",
     "react-dom": "^16.8.5",
-    "react-scripts": "2.1.8"
+    "react-scripts": "2.1.8",
+    "websocket-stream": "^5.3.0"
   },
   "scripts": {
     "start": "react-scripts start",
