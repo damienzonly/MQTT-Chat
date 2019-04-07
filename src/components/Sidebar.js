@@ -6,20 +6,18 @@ export default class Sidebar extends Component {
             <input
                 type="button"
                 key={item.id}
-                onClick={this.props.onFocus}
+                onClick={this.props.toggleRoom}
                 className="list-group-item border border-0 bg-dark text-light"
                 value={item.room}
             />
         ));
-        roomsGroup.push(
-            <>
-                <button type="button" className="bg-dark border border-0 text-light"> <i className="fa fa-plus"></i></button>
-            </>
-        );
         return (
-            <>
-                <ul className="list-group">{roomsGroup}</ul>
-            </>
+            <div className="list-group">
+                {roomsGroup}
+                <button onClick={this.props.addRoom} type="button" className="bg-dark border border-0 text-light">
+                    <i className="fa fa-plus p-3" />
+                </button>
+            </div>
         );
     }
 }

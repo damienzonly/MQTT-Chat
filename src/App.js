@@ -10,21 +10,27 @@ class App extends Component {
         super(props);
         this.state = {
             account: "user " + Math.floor(Math.random() * 100),
-            screens: [],
-            subscriptions: [],
-            msgIndex: 0,
-            currentScreen: ""
+            messageID: 0,
+            roomID: 0,
+            currentRoom: "",
+            rooms: [
+                {
+                    room: "general",
+                    id: 0,
+                    messages: []
+                }
+            ]
         };
     }
     incrementMsgIndex = () => {
-        let next;
+        let nextIndex;
         this.setState(state => {
-            next = state.msgIndex;
+            nextIndex = state.msgIndex;
             return {
                 msgIndex: state.msgIndex + 1
             };
         });
-        return next;
+        return nextIndex;
     };
     componentDidMount = () => {
         this.client = mqtt.connect("ws://localhost", {
@@ -42,55 +48,55 @@ class App extends Component {
             });
     };
 
-    toggleScreen = e => {
+    toggleRoom = e => {
         e.preventDefault();
-        this.setState({currentScreen: e.target.value})
+        this.setState({ currentRoom: e.target.value });
         console.log(e.target.value);
     };
 
+    addRoom = name => {
+        this.setState(state => {
+            let newRoomName = prompt("Enter the new room name");
+            if (!newRoomName) return;
+            if (state.rooms.map(item => item.room).indexOf(newRoomName) !== -1) return;
+            let newRoomID = state.roomID + 1;
+            return {
+                roomID: newRoomID,
+                rooms: [
+                    ...state.rooms,
+                    {
+                        room: newRoomName,
+                        id: newRoomID
+                    }
+                ]
+            };
+        });
+    };
+
     render() {
-        let display;
-        if (this.state.currentScreen) {
-            display = <Display screen={this.state.currentScreen} />;
-        } else {
-            display = <div className="text-center">Select one room using the left sidebar</div>;
-        }
+        
         return (
             <>
-                <div className="row">
+                <div className="row no-gutters">
                     <div className="col-md-12 mb-4 ">
                         <Navbar account={this.state.account} />
                     </div>
                 </div>
-                <div className="row">
-                    <div className="col-md-2 bg-dark text-light">
-                        <Sidebar
-                            rooms={[
-                                {
-                                    room: "room 1",
-                                    id: 1
-                                },
-                                {
-                                    room: "room 2",
-                                    id: 2
-                                },
-                                {
-                                    room: "room 3",
-                                    id: 3
-                                },
-                                {
-                                    room: "room 4",
-                                    id: 4
-                                },
-                                {
-                                    room: "room 5",
-                                    id: 5
-                                }
-                            ]}
-                            onFocus={this.toggleScreen}
-                        />
+
+
+                <div className="row no-gutters">
+
+
+                    <div className="col-md-2 border border-0 bg-dark text-light">
+                        <Sidebar rooms={this.state.rooms} toggleRoom={this.toggleRoom} addRoom={this.addRoom} />
                     </div>
-                    <div className="col-md-6 border border-0 bg-dark text-light">{display}</div>
+
+
+                    <div className="col-md-6 border border-0 bg-dark text-light">
+                        <Display currentRoom={this.state.currentRoom} />
+                    </div>
+
+
                     <div className="col-md-4 border border-0 bg-dark text-light">
                         <h4>User profile</h4>
                         <strong>Username</strong>: {this.state.account}
