@@ -22,6 +22,7 @@ class App extends Component {
             ]
         };
     }
+
     incrementMsgIndex = () => {
         let nextIndex;
         this.setState(state => {
@@ -32,7 +33,9 @@ class App extends Component {
         });
         return nextIndex;
     };
-    componentDidMount = () => {
+
+    componentWillMount = () => {
+        // initialize mqtt
         this.client = mqtt.connect("ws://localhost", {
             port: 8888
         });
@@ -44,21 +47,23 @@ class App extends Component {
                 if (err) console.error(err);
             })
             .on("message", (topic, message) => {
-                // this.pushMessage(message.toString(), "text-left");
+                console.log(message.toString());
             });
     };
 
     toggleRoom = e => {
         e.preventDefault();
+        this.client.subscribe(e.target.value);
         this.setState({ currentRoom: e.target.value });
-        console.log(e.target.value);
+        console.log("switching room:", e.target.value);
     };
 
-    addRoom = name => {
+    addRoom = () => {
         this.setState(state => {
             let newRoomName = prompt("Enter the new room name");
             if (!newRoomName) return;
             if (state.rooms.map(item => item.room).indexOf(newRoomName) !== -1) return;
+            this.client.subscribe(newRoomName);
             let newRoomID = state.roomID + 1;
             return {
                 roomID: newRoomID,
@@ -66,15 +71,24 @@ class App extends Component {
                     ...state.rooms,
                     {
                         room: newRoomName,
-                        id: newRoomID
+                        id: newRoomID,
+                        messages: []
                     }
                 ]
             };
         });
     };
 
+    getCurrentRoom = () => {
+        let room = this.state.rooms.filter(item => item.room === this.state.currentRoom);
+        if (room.length === 1) {
+            return room[0];
+        } else {
+            throw Error("too many rooms with the same name");
+        }
+    };
+
     render() {
-        
         return (
             <>
                 <div className="row no-gutters">
