@@ -8,18 +8,19 @@ let mqtt = require("mqtt");
 class App extends Component {
     constructor(props) {
         super(props);
+        let rooms = [
+            {
+                room: "global",
+                id: 0,
+                messages: []
+            }
+        ];
         this.state = {
             account: "user " + Math.floor(Math.random() * 100),
             messageID: 0,
-            roomID: 0,
-            currentRoom: "",
-            rooms: [
-                {
-                    room: "general",
-                    id: 0,
-                    messages: []
-                }
-            ]
+            roomID: rooms[rooms.length - 1].id,
+            currentRoom: "global",
+            rooms
         };
     }
 
@@ -39,6 +40,9 @@ class App extends Component {
         this.client = mqtt.connect("ws://localhost", {
             port: 8888
         });
+        for (const room of this.state.rooms.map(item => item.room)) {
+            this.client.subscribe(room);
+        }
         this.client
             .on("connect", () => {
                 console.debug("Client mqtt connected");
@@ -97,19 +101,14 @@ class App extends Component {
                     </div>
                 </div>
 
-
                 <div className="row no-gutters">
-
-
                     <div className="col-md-2 border border-0 bg-dark text-light">
                         <Sidebar rooms={this.state.rooms} toggleRoom={this.toggleRoom} addRoom={this.addRoom} />
                     </div>
 
-
                     <div className="col-md-6 border border-0 bg-dark text-light">
                         <Display currentRoom={this.state.currentRoom} />
                     </div>
-
 
                     <div className="col-md-4 border border-0 bg-dark text-light">
                         <h4>User profile</h4>
