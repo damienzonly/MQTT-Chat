@@ -1,15 +1,34 @@
 import React, { Component } from "react";
 import Display from "./components/Display";
 import Navbar from "./components/static/Navbar";
+import Sidebar from "./components/Sidebar";
 
 let mqtt = require("mqtt");
 
 class App extends Component {
     constructor(props) {
         super(props);
+        this.state = {
+            account: "user " + Math.floor(Math.random() * 100),
+            screens: [],
+            subscriptions: [],
+            msgIndex: 0,
+            currentScreen: ""
+        };
+    }
+    incrementMsgIndex = () => {
+        let next;
+        this.setState(state => {
+            next = state.msgIndex;
+            return {
+                msgIndex: state.msgIndex + 1
+            };
+        });
+        return next;
+    };
+    componentDidMount = () => {
         this.client = mqtt.connect("ws://localhost", {
-            port: 8888,
-            clientId: "mqtt-chat-user-" + Math.floor(Math.random() * 1000)
+            port: 8888
         });
         this.client
             .on("connect", () => {
@@ -19,75 +38,65 @@ class App extends Component {
                 if (err) console.error(err);
             })
             .on("message", (topic, message) => {
-                this.pushMessage(message.toString(), "text-left");
+                // this.pushMessage(message.toString(), "text-left");
             });
-        this.state = {
-            messages: [],
-            subTarget: "",
-            subSelf: "",
-            msgIndex: 0
-        };
-    }
-    subTargetChange = event => {
-        this.setState({ subTarget: event.target.value });
     };
-    subSelfChange = event => {
-        this.setState({ subSelf: event.target.value });
+
+    toggleScreen = e => {
+        e.preventDefault();
+        this.setState({currentScreen: e.target.value})
+        console.log(e.target.value);
     };
-    subTargetKeyPress = event => {
-        if (event.target.value === "") return;
-        if (event.keyCode === 13) {
-            this.subTargetChange(event);
-        }
-    };
-    subSelfKeyPress = event => {
-        if (event.target.value === "") return;
-        if (event.keyCode === 13) {
-            this.subSelfChange(event);
-            this.setState(state => {
-                this.client.subscribe(state.subSelf);
-            });
-        }
-    };
-    pushMessage = (message, side) => {
-        if (message === "") return;
-        this.setState(state => {
-            this.client.publish(state.subTarget, message);
-            let newMessage = {
-                index: state.msgIndex + 1,
-                message,
-                side: side || "text-right"
-            };
-            if (state.messages.length === 10) {
-                return {
-                    msgIndex: state.msgIndex + 1,
-                    messages: [...state.messages.slice(1), newMessage]
-                };
-            } else {
-                return {
-                    msgIndex: state.msgIndex + 1,
-                    messages: [...state.messages, newMessage]
-                };
-            }
-        });
-    };
+
     render() {
+        let display;
+        if (this.state.currentScreen) {
+            display = <Display screen={this.state.currentScreen} />;
+        } else {
+            display = <div className="text-center">Select one room using the left sidebar</div>;
+        }
         return (
-            <div className="row no-gutters">
-                <div className="col-md-4 offset-md-4">
-                    <Navbar />
-                    <Display
-                        messages={this.state.messages}
-                        subTarget={this.state.subTarget}
-                        subSelf={this.state.subSelf}
-                        pushMessage={this.pushMessage}
-                        subTargetChange={this.subTargetChange}
-                        subSelfChange={this.subSelfChange}
-                        subSelfKeyPress={this.subSelfKeyPress}
-                        subTargetKeyPress={this.subTargetKeyPress}
-                    />
+            <>
+                <div className="row">
+                    <div className="col-md-12 mb-4 ">
+                        <Navbar account={this.state.account} />
+                    </div>
                 </div>
-            </div>
+                <div className="row">
+                    <div className="col-md-2 bg-dark text-light">
+                        <Sidebar
+                            rooms={[
+                                {
+                                    room: "room 1",
+                                    id: 1
+                                },
+                                {
+                                    room: "room 2",
+                                    id: 2
+                                },
+                                {
+                                    room: "room 3",
+                                    id: 3
+                                },
+                                {
+                                    room: "room 4",
+                                    id: 4
+                                },
+                                {
+                                    room: "room 5",
+                                    id: 5
+                                }
+                            ]}
+                            onFocus={this.toggleScreen}
+                        />
+                    </div>
+                    <div className="col-md-6 border border-0 bg-dark text-light">{display}</div>
+                    <div className="col-md-4 border border-0 bg-dark text-light">
+                        <h4>User profile</h4>
+                        <strong>Username</strong>: {this.state.account}
+                    </div>
+                </div>
+            </>
         );
     }
 }
