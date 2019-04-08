@@ -1,12 +1,9 @@
 import React, { Component } from "react";
-import Display from "./components/Display";
-import Navbar from "./components/static/Navbar";
-import Sidebar from "./components/Sidebar";
-import OnlineStatus from "./components/OnlineStatus";
+import Dashboard from "./components/Dashboard";
 
 let mqtt = require("mqtt");
 
-class App extends Component {
+class ChatApp extends Component {
     constructor(props) {
         super(props);
         let rooms = [
@@ -45,17 +42,6 @@ class App extends Component {
         });
     };
 
-    incrementMsgIndex = () => {
-        let nextIndex;
-        this.setState(state => {
-            nextIndex = state.msgIndex;
-            return {
-                msgIndex: state.msgIndex + 1
-            };
-        });
-        return nextIndex;
-    };
-
     componentWillMount = () => {
         // initialize mqtt
         this.client = mqtt.connect("ws://localhost", {
@@ -75,14 +61,13 @@ class App extends Component {
             })
             .on("message", (topic, message) => {
                 try {
-                    message = JSON.parse(message)
+                    message = JSON.parse(message);
                     console.log("received", message);
                     if (message.sender === this.state.account) return;
-                    this.addMessageToRoom(message)
-                } catch(e) {
-                    console.error(e)
+                    this.addMessageToRoom(message);
+                } catch (e) {
+                    console.error(e);
                 }
-                
             });
     };
 
@@ -125,38 +110,16 @@ class App extends Component {
 
     render() {
         return (
-            <>
-                <div className="row no-gutters">
-                    <div className="col-md-12 mb-4 ">
-                        <Navbar account={this.state.account} />
-                    </div>
-                </div>
-
-                <div className="row no-gutters">
-                    <div className="col-md-2 bg-dark text-light">
-                        <Sidebar rooms={this.state.rooms} toggleRoom={this.toggleRoom} addRoom={this.addRoom} />
-                    </div>
-
-                    <div
-                        className="col-md-6 border border-top-0 border-bottom-0 bg-dark text-light"
-                        style={{
-                            height: 600
-                        }}
-                    >
-                        <Display
-                            addMessageToRoom={this.addMessageToRoom}
-                            account={this.state.account}
-                            currentRoom={this.getCurrentRoom()}
-                        />
-                    </div>
-
-                    <div className="col-md-4 bg-dark text-light">
-                        <OnlineStatus />
-                    </div>
-                </div>
-            </>
+            <Dashboard
+                account={this.state.account}
+                rooms={this.state.rooms}
+                toggleRoom={this.toggleRoom}
+                addRoom={this.addRoom}
+                addMessageToRoom={this.addMessageToRoom}
+                currentRoom={this.getCurrentRoom()}
+            />
         );
     }
 }
 
-export default App;
+export default ChatApp;
