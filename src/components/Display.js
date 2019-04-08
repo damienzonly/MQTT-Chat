@@ -5,8 +5,10 @@ export default function Display(props) {
     if (props.currentRoom) {
         return (
             <div className="container">
-                <div className="container">{props.currentRoom.capFirst()}</div>
-                <InputArea />
+                <div>Room: {props.currentRoom.capFirst()}</div>
+                <div className="pt-3">
+                    <InputArea />
+                </div>
             </div>
         );
     }

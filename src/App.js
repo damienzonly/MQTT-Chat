@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import Display from "./components/Display";
 import Navbar from "./components/static/Navbar";
 import Sidebar from "./components/Sidebar";
+import OnlineStatus from "./components/OnlineStatus";
 
 let mqtt = require("mqtt");
 
@@ -102,17 +103,21 @@ class App extends Component {
                 </div>
 
                 <div className="row no-gutters">
-                    <div className="col-md-2 border border-0 bg-dark text-light">
+                    <div className="col-md-2 bg-dark text-light">
                         <Sidebar rooms={this.state.rooms} toggleRoom={this.toggleRoom} addRoom={this.addRoom} />
                     </div>
 
-                    <div className="col-md-6 border border-0 bg-dark text-light">
+                    <div
+                        className="col-md-6 border border-top-0 border-bottom-0 bg-dark text-light"
+                        style={{
+                            height: 400
+                        }}
+                    >
                         <Display currentRoom={this.state.currentRoom} />
                     </div>
 
-                    <div className="col-md-4 border border-0 bg-dark text-light">
-                        <h4>User profile</h4>
-                        <strong>Username</strong>: {this.state.account}
+                    <div className="col-md-4 bg-dark text-light">
+                        <OnlineStatus />
                     </div>
                 </div>
             </>

@@ -23,11 +23,11 @@ export default class InputArea extends Component {
     };
     render() {
         return (
-            <>
+            <div className="container">
                 <div className="form-group">
                     <textarea value={this.state.message} className="form-control" onChange={this.onChange} onKeyDown={this.onKeyDown} />
                 </div>
-            </>
+            </div>
         );
     }
 }
