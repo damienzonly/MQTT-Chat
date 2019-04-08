@@ -5,8 +5,15 @@ export default function Display(props) {
     if (props.currentRoom) {
         return (
             <div className="container">
-                <div>Room: {props.currentRoom.capFirst()}</div>
-                <div className="pt-3">
+                <div className="container mt-3">Room: {props.currentRoom.capFirst()}</div>
+                <div
+                    className="container"
+                    style={{
+                        position: "absolute",
+                        bottom: 0,
+                        left: 0
+                    }}
+                >
                     <InputArea />
                 </div>
             </div>
