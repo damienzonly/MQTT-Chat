@@ -6,7 +6,7 @@ export default class Sidebar extends Component {
             <input
                 type="button"
                 key={index}
-                onClick={this.props.toggleRoom}
+                onClick={this.props.openRoom}
                 className="list-group-item border border-0 bg-dark text-light"
                 value={item}
             />

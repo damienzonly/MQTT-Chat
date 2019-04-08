@@ -79,11 +79,12 @@ class ChatApp extends Component {
             });
     };
 
-    toggleRoom = e => {
+    openRoom = e => {
         e.preventDefault();
-        this.client.subscribe(e.target.value);
-        this.setState({ currentRoom: e.target.value });
-        console.log("switching room:", e.target.value);
+        let nextRoom = e.target.value;
+        this.client.subscribe(nextRoom);
+        this.setState({ currentRoom: nextRoom });
+        console.log("switching room:", nextRoom);
     };
 
     addRoom = () => {
@@ -112,7 +113,7 @@ class ChatApp extends Component {
             <Dashboard
                 account={this.state.account}
                 rooms={this.state.rooms}
-                toggleRoom={this.toggleRoom}
+                openRoom={this.openRoom}
                 addRoom={this.addRoom}
                 addMessageToRoom={this.addMessageToRoom}
                 currentRoom={{

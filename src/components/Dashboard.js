@@ -15,7 +15,7 @@ export default function Dashboard(props) {
 
             <div className="row no-gutters">
                 <div className="col-md-2 bg-dark text-light">
-                    <Sidebar rooms={props.rooms} toggleRoom={props.toggleRoom} addRoom={props.addRoom} />
+                    <Sidebar rooms={props.rooms} openRoom={props.openRoom} addRoom={props.addRoom} />
                 </div>
 
                 <div className="col-md-6 border border-top-0 border-bottom-0 bg-dark text-light">
