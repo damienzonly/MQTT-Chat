@@ -19,7 +19,15 @@ export default function Dashboard(props) {
                 </div>
 
                 <div className="col-md-6 border border-top-0 border-bottom-0 bg-dark text-light">
-                    <Display addMessageToRoom={props.addMessageToRoom} account={props.account} currentRoom={props.currentRoom} />
+                    <Display
+                        addMessageToRoom={props.addMessageToRoom}
+                        account={props.account}
+                        currentRoom={props.currentRoom}
+                        onTextareaSubmit={props.onTextareaSubmit}
+                        onTextareaChange={props.onTextareaChange}
+                        onTextareaKeyDown={props.onTextareaKeyDown}
+                        currentMessage={props.currentMessage}
+                    />
                 </div>
 
                 <div className="col-md-4 bg-dark text-light">

@@ -30,7 +30,11 @@ export default function Display(props) {
                     >
                         {messages}
                     </div>
-                    <InputArea addMessageToRoom={props.addMessageToRoom} account={props.account} />
+                    <InputArea
+                        onTextareaChange={props.onTextareaChange}
+                        onTextareaKeyDown={props.onTextareaKeyDown}
+                        currentMessage={props.currentMessage}
+                    />
                 </div>
             </div>
         );

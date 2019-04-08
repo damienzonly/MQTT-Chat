@@ -6,21 +6,21 @@ let mqtt = require("mqtt");
 class ChatApp extends Component {
     constructor(props) {
         super(props);
-        let rooms = {
-            global: {
-                messages: [
-                    {
-                        text: "Hello!",
-                        sender: "default-account",
-                        time: new Date()
-                    }
-                ]
-            }
-        };
         this.state = {
             account: "user " + Math.floor(Math.random() * 100),
             currentRoom: "global",
-            rooms
+            currentMessage: "",
+            rooms: {
+                global: {
+                    messages: [
+                        {
+                            text: "Hello!",
+                            sender: "default-account",
+                            time: new Date()
+                        }
+                    ]
+                }
+            }
         };
     }
 
@@ -108,6 +108,28 @@ class ChatApp extends Component {
         return this.state.rooms[this.state.currentRoom];
     };
 
+    onTextareaSubmit = event => {
+        event.preventDefault();
+        this.addMessageToRoom({
+            sender: this.state.account,
+            text: this.state.currentMessage
+        });
+        setTimeout(() => {
+            this.setState({ currentMessage: "" });
+        }, 0);
+    };
+    onTextareaChange = event => {
+        this.setState({ currentMessage: event.target.value });
+    };
+    onTextareaKeyDown = event => {
+        console.log("keydown", event.key);
+        if (event.keyCode === 13) {
+            if (!event.shiftKey) {
+                this.onTextareaSubmit(event);
+            }
+        }
+    };
+
     render() {
         return (
             <Dashboard
@@ -121,6 +143,9 @@ class ChatApp extends Component {
                     room: this.getCurrentRoom()
                 }}
                 currentRoomName={this.state.currentRoom}
+                currentMessage={this.state.currentMessage}
+                onTextareaChange={this.onTextareaChange}
+                onTextareaKeyDown={this.onTextareaKeyDown}
             />
         );
     }
