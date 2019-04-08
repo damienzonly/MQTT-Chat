@@ -9,6 +9,10 @@ export default class InputArea extends Component {
     }
     onSubmit = event => {
         event.preventDefault();
+        this.props.addMessageToRoom({
+            sender: this.props.account,
+            text: this.state.message
+        });
         this.setState({ message: "" });
     };
     onChange = event => {
@@ -25,7 +29,13 @@ export default class InputArea extends Component {
         return (
             <div className="container">
                 <div className="form-group">
-                    <textarea value={this.state.message} className="form-control" onChange={this.onChange} onKeyDown={this.onKeyDown} />
+                    <textarea
+                        placeholder="Type a message..."
+                        value={this.state.message}
+                        className="form-control"
+                        onChange={this.onChange}
+                        onKeyDown={this.onKeyDown}
+                    />
                 </div>
             </div>
         );

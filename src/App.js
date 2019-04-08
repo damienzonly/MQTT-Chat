@@ -12,18 +12,38 @@ class App extends Component {
         let rooms = [
             {
                 room: "global",
-                id: 0,
-                messages: []
+                messages: [
+                    {
+                        text: "Hello!",
+                        sender: "default-account",
+                        time: new Date()
+                    }
+                ]
             }
         ];
         this.state = {
             account: "user " + Math.floor(Math.random() * 100),
-            messageID: 0,
-            roomID: rooms[rooms.length - 1].id,
             currentRoom: "global",
             rooms
         };
     }
+
+    addMessageToRoom = message => {
+        if (message.text === "") return;
+        this.setState(state => {
+            let rooms = state.rooms;
+            let roomPosition = state.rooms.map(item => item.room).indexOf(this.state.currentRoom);
+            let roomFound = state.rooms[roomPosition];
+            roomFound.messages.push({
+                text: message.text,
+                sender: message.sender,
+                time: new Date()
+            });
+            return {
+                rooms
+            };
+        });
+    };
 
     incrementMsgIndex = () => {
         let nextIndex;
@@ -41,18 +61,28 @@ class App extends Component {
         this.client = mqtt.connect("ws://localhost", {
             port: 8888
         });
-        for (const room of this.state.rooms.map(item => item.room)) {
-            this.client.subscribe(room);
-        }
+
         this.client
             .on("connect", () => {
                 console.debug("Client mqtt connected");
+                for (const room of this.state.rooms.map(item => item.room)) {
+                    this.client.subscribe(room);
+                    console.log("subscribed to", room);
+                }
             })
             .on("error", err => {
                 if (err) console.error(err);
             })
             .on("message", (topic, message) => {
-                console.log(message.toString());
+                try {
+                    message = JSON.parse(message)
+                    console.log("received", message);
+                    if (message.sender === this.state.account) return;
+                    this.addMessageToRoom(message)
+                } catch(e) {
+                    console.error(e)
+                }
+                
             });
     };
 
@@ -110,10 +140,14 @@ class App extends Component {
                     <div
                         className="col-md-6 border border-top-0 border-bottom-0 bg-dark text-light"
                         style={{
-                            height: 400
+                            height: 600
                         }}
                     >
-                        <Display currentRoom={this.state.currentRoom} />
+                        <Display
+                            addMessageToRoom={this.addMessageToRoom}
+                            account={this.state.account}
+                            currentRoom={this.getCurrentRoom()}
+                        />
                     </div>
 
                     <div className="col-md-4 bg-dark text-light">
