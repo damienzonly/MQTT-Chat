@@ -2,13 +2,13 @@ import React, { Component } from "react";
 
 export default class Sidebar extends Component {
     render() {
-        let roomsGroup = this.props.rooms.map((item, index) => (
+        let roomsGroup = Object.keys(this.props.rooms).map((item, index) => (
             <input
                 type="button"
                 key={index}
                 onClick={this.props.toggleRoom}
                 className="list-group-item border border-0 bg-dark text-light"
-                value={item.room}
+                value={item}
             />
         ));
         return (

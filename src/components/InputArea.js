@@ -27,7 +27,7 @@ export default class InputArea extends Component {
     };
     render() {
         return (
-            <div className="container">
+            <div className="container mt-5">
                 <div className="form-group">
                     <textarea
                         placeholder="Type a message..."

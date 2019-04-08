@@ -18,12 +18,7 @@ export default function Dashboard(props) {
                     <Sidebar rooms={props.rooms} toggleRoom={props.toggleRoom} addRoom={props.addRoom} />
                 </div>
 
-                <div
-                    className="col-md-6 border border-top-0 border-bottom-0 bg-dark text-light"
-                    style={{
-                        height: 600
-                    }}
-                >
+                <div className="col-md-6 border border-top-0 border-bottom-0 bg-dark text-light">
                     <Display addMessageToRoom={props.addMessageToRoom} account={props.account} currentRoom={props.currentRoom} />
                 </div>
 

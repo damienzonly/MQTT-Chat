@@ -6,9 +6,8 @@ let mqtt = require("mqtt");
 class ChatApp extends Component {
     constructor(props) {
         super(props);
-        let rooms = [
-            {
-                room: "global",
+        let rooms = {
+            global: {
                 messages: [
                     {
                         text: "Hello!",
@@ -17,7 +16,7 @@ class ChatApp extends Component {
                     }
                 ]
             }
-        ];
+        };
         this.state = {
             account: "user " + Math.floor(Math.random() * 100),
             currentRoom: "global",
@@ -28,18 +27,27 @@ class ChatApp extends Component {
     addMessageToRoom = message => {
         if (message.text === "") return;
         this.setState(state => {
-            let rooms = state.rooms;
-            let roomPosition = state.rooms.map(item => item.room).indexOf(this.state.currentRoom);
-            let roomFound = state.rooms[roomPosition];
-            roomFound.messages.push({
-                text: message.text,
-                sender: message.sender,
-                time: new Date()
-            });
+            let room = state.rooms[state.currentRoom];
+            room.messages = [
+                ...room.messages,
+                {
+                    text: message.text,
+                    sender: message.sender,
+                    time: new Date()
+                }
+            ];
             return {
-                rooms
+                rooms: {
+                    ...state.rooms,
+                    [state.currentRoom]: room
+                }
             };
-        });
+        }, this.scrollMessagesToBottom);
+    };
+
+    scrollMessagesToBottom = () => {
+        let g = document.getElementById("messages-list");
+        g.scrollTop = g.scrollHeight;
     };
 
     componentWillMount = () => {
@@ -51,7 +59,7 @@ class ChatApp extends Component {
         this.client
             .on("connect", () => {
                 console.debug("Client mqtt connected");
-                for (const room of this.state.rooms.map(item => item.room)) {
+                for (const room of Object.keys(this.state.rooms)) {
                     this.client.subscribe(room);
                     console.log("subscribed to", room);
                 }
@@ -82,30 +90,21 @@ class ChatApp extends Component {
         this.setState(state => {
             let newRoomName = prompt("Enter the new room name");
             if (!newRoomName) return;
-            if (state.rooms.map(item => item.room).indexOf(newRoomName) !== -1) return;
+            if (this.state.rooms.hasOwnProperty(newRoomName)) return;
             this.client.subscribe(newRoomName);
-            let newRoomID = state.roomID + 1;
             return {
-                roomID: newRoomID,
-                rooms: [
+                rooms: {
                     ...state.rooms,
-                    {
-                        room: newRoomName,
-                        id: newRoomID,
+                    [newRoomName]: {
                         messages: []
                     }
-                ]
+                }
             };
         });
     };
 
     getCurrentRoom = () => {
-        let room = this.state.rooms.filter(item => item.room === this.state.currentRoom);
-        if (room.length === 1) {
-            return room[0];
-        } else {
-            throw Error("too many rooms with the same name");
-        }
+        return this.state.rooms[this.state.currentRoom];
     };
 
     render() {
@@ -116,7 +115,11 @@ class ChatApp extends Component {
                 toggleRoom={this.toggleRoom}
                 addRoom={this.addRoom}
                 addMessageToRoom={this.addMessageToRoom}
-                currentRoom={this.getCurrentRoom()}
+                currentRoom={{
+                    name: this.state.currentRoom,
+                    room: this.getCurrentRoom()
+                }}
+                currentRoomName={this.state.currentRoom}
             />
         );
     }

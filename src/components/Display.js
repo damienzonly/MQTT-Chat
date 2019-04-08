@@ -3,7 +3,7 @@ import React from "react";
 
 export default function Display(props) {
     if (props.currentRoom) {
-        let messages = props.currentRoom.messages.map((item, index) => {
+        let messages = props.currentRoom.room.messages.map((item, index) => {
             let leftRight = item.sender === props.account ? "text-right" : "";
             return (
                 <li key={index} className={"list-group-item border-0 bg-dark text-light " + leftRight}>
@@ -21,16 +21,19 @@ export default function Display(props) {
         });
         return (
             <div className="container">
-                <div className="container mt-3">Room: {props.currentRoom.room.capFirst()}</div>
-                <div
-                    className="container"
-                    style={{
-                        position: "absolute",
-                        bottom: 0,
-                        left: 0
-                    }}
-                >
-                    <div className="container border-0 list-group">{messages}</div>
+                <div className="container mt-3 mb-3">Room: {props.currentRoom.name.capFirst()}</div>
+                <div className="container h-100">
+                    <div
+                        id="messages-list"
+                        className="container list-group overflow-auto"
+                        style={{
+                            height: 400,
+                            maxHeight: 400,
+                            overflowY: "scroll"
+                        }}
+                    >
+                        {messages}
+                    </div>
                     <InputArea addMessageToRoom={props.addMessageToRoom} account={props.account} />
                 </div>
             </div>
