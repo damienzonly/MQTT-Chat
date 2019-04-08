@@ -5,16 +5,12 @@ export default function Display(props) {
     if (props.currentRoom) {
         let messages = props.currentRoom.room.messages.map((item, index) => {
             let leftRight = item.sender === props.account ? "text-right" : "";
+            let time = `${item.time.getHours().pad()}:${item.time.getMinutes().pad()}`;
             return (
                 <li key={index} className={"list-group-item border-0 bg-dark text-light " + leftRight}>
                     <span style={{ color: "red" }}> {item.sender}</span>: {item.text}
-                    <span
-                        style={{
-                            fontSize: 12,
-                            display: "block"
-                        }}
-                    >
-                        {item.time.getHours()}:{item.time.getMinutes()}{" "}
+                    <span className="d-block" style={{ fontSize: 12 }}>
+                        {time}
                     </span>
                 </li>
             );

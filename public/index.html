@@ -29,6 +29,10 @@
                 if (this.length === 1) return this.toUpperCase();
                 return this.charAt(0).toUpperCase() + this.slice(1)
             }
+            Number.prototype.pad = function pad() {
+                if (this >= 0 && this < 10) return "0" + this.toString();
+                return this;
+            }
         </script>
     </body>
 </html>
