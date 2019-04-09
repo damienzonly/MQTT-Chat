@@ -45,11 +45,6 @@ class ChatApp extends Component {
         }, this.scrollMessagesToBottom);
     };
 
-    scrollMessagesToBottom = () => {
-        let g = document.getElementById("messages-list");
-        g.scrollTop = g.scrollHeight;
-    };
-
     componentWillMount = () => {
         // initialize mqtt
         this.client = mqtt.connect("ws://localhost", {
@@ -61,7 +56,7 @@ class ChatApp extends Component {
                 console.debug("Client mqtt connected");
                 for (const room of Object.keys(this.state.rooms)) {
                     this.client.subscribe(room);
-                    console.log("subscribed to", room);
+                    console.debug("subscribed to", room);
                 }
             })
             .on("error", err => {
@@ -70,7 +65,7 @@ class ChatApp extends Component {
             .on("message", (topic, message) => {
                 try {
                     message = JSON.parse(message);
-                    console.log("received", message);
+                    console.debug("received", message);
                     if (message.sender === this.state.account) return;
                     this.addMessageToRoom(message);
                 } catch (e) {
@@ -84,7 +79,19 @@ class ChatApp extends Component {
         let nextRoom = e.target.value;
         this.client.subscribe(nextRoom);
         this.setState({ currentRoom: nextRoom });
-        console.log("switching room:", nextRoom);
+        setTimeout(() => {
+            this.scrollMessagesToBottom();
+            this.focusTextArea();
+        }, 0);
+    };
+
+    focusTextArea = () => {
+        document.getElementById("message-field").focus();
+    };
+
+    scrollMessagesToBottom = () => {
+        let g = document.getElementById("messages-list");
+        g.scrollTop = g.scrollHeight;
     };
 
     addRoom = () => {
@@ -122,7 +129,6 @@ class ChatApp extends Component {
         this.setState({ currentMessage: event.target.value });
     };
     onTextareaKeyDown = event => {
-        console.log("keydown", event.key);
         if (event.keyCode === 13) {
             if (!event.shiftKey) {
                 this.onTextareaSubmit(event);
@@ -138,10 +144,8 @@ class ChatApp extends Component {
                 openRoom={this.openRoom}
                 addRoom={this.addRoom}
                 addMessageToRoom={this.addMessageToRoom}
-                currentRoom={{
-                    name: this.state.currentRoom,
-                    room: this.getCurrentRoom()
-                }}
+                currentRoom={this.state.currentRoom}
+                getCurrentRoom={this.getCurrentRoom}
                 currentRoomName={this.state.currentRoom}
                 currentMessage={this.state.currentMessage}
                 onTextareaChange={this.onTextareaChange}

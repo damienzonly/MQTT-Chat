@@ -23,6 +23,7 @@ export default function Dashboard(props) {
                         addMessageToRoom={props.addMessageToRoom}
                         account={props.account}
                         currentRoom={props.currentRoom}
+                        getCurrentRoom={props.getCurrentRoom}
                         onTextareaSubmit={props.onTextareaSubmit}
                         onTextareaChange={props.onTextareaChange}
                         onTextareaKeyDown={props.onTextareaKeyDown}

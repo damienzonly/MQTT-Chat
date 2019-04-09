@@ -3,7 +3,8 @@ import React from "react";
 
 export default function Display(props) {
     if (props.currentRoom) {
-        let messages = props.currentRoom.room.messages.map((item, index) => {
+        let room = props.getCurrentRoom();
+        let messages = room.messages.map((item, index) => {
             let leftRight = item.sender === props.account ? "text-right" : "";
             let time = `${item.time.getHours().pad()}:${item.time.getMinutes().pad()}`;
             return (
@@ -17,7 +18,7 @@ export default function Display(props) {
         });
         return (
             <div className="container">
-                <div className="container mt-3 mb-3">Room: {props.currentRoom.name.capFirst()}</div>
+                <div className="container mt-3 mb-3">Room: {props.currentRoom.capFirst()}</div>
                 <div className="container h-100">
                     <div
                         id="messages-list"
