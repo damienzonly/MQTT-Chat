@@ -82,7 +82,7 @@ class ChatApp extends Component {
         this.setState({ currentRoom: nextRoom });
         setTimeout(() => {
             this.scrollMessagesToBottom();
-            this.focusTex1tArea();
+            this.focusTextArea();
         }, 0);
     };
 
