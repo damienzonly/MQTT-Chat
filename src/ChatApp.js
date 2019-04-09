@@ -14,7 +14,7 @@ class ChatApp extends Component {
                 global: {
                     messages: [
                         {
-                            text: "Hello!",
+                            text: "Welcome to the IRC chat",
                             sender: "default-account",
                             time: new Date()
                         }
@@ -26,23 +26,25 @@ class ChatApp extends Component {
 
     addMessageToRoom = message => {
         if (message.text === "") return;
-        this.setState(state => {
-            let room = state.rooms[state.currentRoom];
-            room.messages = [
-                ...room.messages,
-                {
-                    text: message.text,
-                    sender: message.sender,
-                    time: new Date()
-                }
-            ];
-            return {
-                rooms: {
-                    ...state.rooms,
-                    [state.currentRoom]: room
-                }
-            };
-        }, this.scrollMessagesToBottom);
+        this.setState(
+            state => {
+                let room = state.rooms[state.currentRoom];
+                room.messages = [
+                    ...room.messages,
+                    {
+                        text: message.text,
+                        sender: message.sender,
+                        time: new Date()
+                    }
+                ];
+                return {
+                    rooms: {
+                        ...state.rooms,
+                        [state.currentRoom]: room
+                    }
+                };
+            }, this.scrollMessagesToBottom
+        );
     };
 
     componentWillMount = () => {
@@ -82,7 +84,7 @@ class ChatApp extends Component {
         this.setState({ currentRoom: nextRoom });
         setTimeout(() => {
             this.scrollMessagesToBottom();
-            this.focusTex1tArea();
+            this.focusTextArea();
         }, 0);
     };
 
@@ -113,8 +115,7 @@ class ChatApp extends Component {
         });
         setImmediate(() => {
             this.openRoom(newRoomName);
-        })
-        
+        });
     };
 
     getCurrentRoom = () => {
@@ -127,9 +128,16 @@ class ChatApp extends Component {
             sender: this.state.account,
             text: this.state.currentMessage
         });
-        setTimeout(() => {
+        setImmediate(() => {
+            this.client.publish(
+                this.state.currentRoom,
+                JSON.stringify({
+                    sender: this.state.account,
+                    text: this.state.currentMessage
+                })
+            );
             this.setState({ currentMessage: "" });
-        }, 0);
+        });
     };
     onTextareaChange = event => {
         this.setState({ currentMessage: event.target.value });
