@@ -75,13 +75,14 @@ class ChatApp extends Component {
     };
 
     openRoom = e => {
-        e.preventDefault();
-        let nextRoom = e.target.value;
+        let typeof_e = typeof e !== "string";
+        if (typeof_e) e.preventDefault();
+        let nextRoom = typeof_e ? e.target.value : e;
         this.client.subscribe(nextRoom);
         this.setState({ currentRoom: nextRoom });
         setTimeout(() => {
             this.scrollMessagesToBottom();
-            this.focusTextArea();
+            this.focusTex1tArea();
         }, 0);
     };
 
@@ -95,8 +96,9 @@ class ChatApp extends Component {
     };
 
     addRoom = () => {
+        let newRoomName;
         this.setState(state => {
-            let newRoomName = prompt("Enter the new room name");
+            newRoomName = prompt("Enter the new room name");
             if (!newRoomName) return;
             if (this.state.rooms.hasOwnProperty(newRoomName)) return;
             this.client.subscribe(newRoomName);
@@ -109,6 +111,10 @@ class ChatApp extends Component {
                 }
             };
         });
+        setImmediate(() => {
+            this.openRoom(newRoomName);
+        })
+        
     };
 
     getCurrentRoom = () => {
