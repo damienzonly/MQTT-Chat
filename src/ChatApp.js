@@ -24,13 +24,14 @@ class ChatApp extends Component {
         };
     }
 
-    addMessageToRoom = message => {
+    addMessageToRoom = (message, room) => {
         if (message.text === "") return;
         this.setState(
             state => {
-                let room = state.rooms[state.currentRoom];
-                room.messages = [
-                    ...room.messages,
+                room = room || state.currentRoom;
+                let nextRoom = state.rooms[room];
+                nextRoom.messages = [
+                    ...nextRoom.messages,
                     {
                         text: message.text,
                         sender: message.sender,
@@ -40,7 +41,7 @@ class ChatApp extends Component {
                 return {
                     rooms: {
                         ...state.rooms,
-                        [state.currentRoom]: room
+                        [room]: nextRoom
                     }
                 };
             }, this.scrollMessagesToBottom
@@ -69,7 +70,7 @@ class ChatApp extends Component {
                     message = JSON.parse(message);
                     console.debug("received", message);
                     if (message.sender === this.state.account) return;
-                    this.addMessageToRoom(message);
+                    this.addMessageToRoom(message, topic);
                 } catch (e) {
                     console.error(e);
                 }
@@ -77,6 +78,7 @@ class ChatApp extends Component {
     };
 
     openRoom = e => {
+        if (!e) return;
         let typeof_e = typeof e !== "string";
         if (typeof_e) e.preventDefault();
         let nextRoom = typeof_e ? e.target.value : e;
