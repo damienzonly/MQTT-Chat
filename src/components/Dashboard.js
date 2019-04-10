@@ -8,17 +8,17 @@ export default function Dashboard(props) {
     return (
         <>
             <div className="row no-gutters">
-                <div className="col-md-12 mb-4 ">
+                <div className="col-md-12 mb-4">
                     <Navbar account={props.account} />
                 </div>
             </div>
 
             <div className="row no-gutters">
-                <div className="col-md-2 bg-dark text-light">
+                <div className="col-md-2 dark-foreground text-light">
                     <Sidebar rooms={props.rooms} openRoom={props.openRoom} addRoom={props.addRoom} />
                 </div>
 
-                <div className="col-md-6 border border-top-0 border-bottom-0 bg-dark text-light">
+                <div className="col-md-6 border dark-foreground border-top-0 border-bottom-0 text-light">
                     <Display
                         addMessageToRoom={props.addMessageToRoom}
                         account={props.account}
@@ -31,7 +31,7 @@ export default function Dashboard(props) {
                     />
                 </div>
 
-                <div className="col-md-4 bg-dark text-light">
+                <div className="col-md-4 dark-foreground text-light">
                     <OnlineStatus account={props.account} currentRoom={props.getCurrentRoom()}/>
                 </div>
             </div>

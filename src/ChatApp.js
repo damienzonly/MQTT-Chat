@@ -1,4 +1,6 @@
-import React, { Component } from "react";
+import React, {
+    Component
+} from "react";
 import Dashboard from "./components/Dashboard";
 
 let mqtt = require("mqtt");
@@ -15,13 +17,11 @@ class ChatApp extends Component {
             currentMessage: "",
             rooms: {
                 global: {
-                    messages: [
-                        {
-                            text: "Welcome to the IRC chat",
-                            sender: "default-account",
-                            time: new Date()
-                        }
-                    ],
+                    messages: [{
+                        text: "Welcome to the IRC chat",
+                        sender: "default-account",
+                        time: new Date()
+                    }],
                     members: {}
                 }
             }
@@ -69,7 +69,9 @@ class ChatApp extends Component {
                         }
                     }
                 }
-                return { rooms };
+                return {
+                    rooms
+                };
             });
         }, 2000);
     };
@@ -145,7 +147,9 @@ class ChatApp extends Component {
         if (typeof_e) e.preventDefault();
         let nextRoom = typeof_e ? e.target.value : e;
         this.client.subscribe(nextRoom);
-        this.setState({ currentRoom: nextRoom });
+        this.setState({
+            currentRoom: nextRoom
+        });
         this.sendDiscovery(nextRoom);
         setTimeout(() => {
             this.scrollMessagesToBottom();
@@ -178,8 +182,7 @@ class ChatApp extends Component {
                     }
                 }
             };
-        });
-        setImmediate(() => {
+        }, () => {
             this.openRoom(newRoomName);
         });
     };
@@ -206,11 +209,15 @@ class ChatApp extends Component {
                     text: this.state.currentMessage
                 })
             );
-            this.setState({ currentMessage: "" });
+            this.setState({
+                currentMessage: ""
+            });
         });
     };
     onTextareaChange = event => {
-        this.setState({ currentMessage: event.target.value });
+        this.setState({
+            currentMessage: event.target.value
+        });
     };
     onTextareaKeyDown = event => {
         if (event.keyCode === 13) {
@@ -221,19 +228,40 @@ class ChatApp extends Component {
     };
 
     render() {
-        return (
-            <Dashboard
-                account={this.state.account}
-                rooms={this.state.rooms}
-                openRoom={this.openRoom}
-                addRoom={this.addRoom}
-                addMessageToRoom={this.addMessageToRoom}
-                currentRoom={this.state.currentRoom}
-                getCurrentRoom={this.getCurrentRoom}
-                currentRoomName={this.state.currentRoom}
-                currentMessage={this.state.currentMessage}
-                onTextareaChange={this.onTextareaChange}
-                onTextareaKeyDown={this.onTextareaKeyDown}
+        return ( <
+            Dashboard account = {
+                this.state.account
+            }
+            rooms = {
+                this.state.rooms
+            }
+            openRoom = {
+                this.openRoom
+            }
+            addRoom = {
+                this.addRoom
+            }
+            addMessageToRoom = {
+                this.addMessageToRoom
+            }
+            currentRoom = {
+                this.state.currentRoom
+            }
+            getCurrentRoom = {
+                this.getCurrentRoom
+            }
+            currentRoomName = {
+                this.state.currentRoom
+            }
+            currentMessage = {
+                this.state.currentMessage
+            }
+            onTextareaChange = {
+                this.onTextareaChange
+            }
+            onTextareaKeyDown = {
+                this.onTextareaKeyDown
+            }
             />
         );
     }

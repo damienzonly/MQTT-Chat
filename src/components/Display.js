@@ -8,7 +8,7 @@ export default function Display(props) {
             let leftRight = item.sender === props.account ? "text-right" : "";
             let time = `${item.time.getHours().pad()}:${item.time.getMinutes().pad()}`;
             return (
-                <li key={index} className={"list-group-item border-0 bg-dark text-light " + leftRight}>
+                <li key={index} className={"list-group-item mt-2 border-circle bg-dark text-light " + leftRight}>
                     <span style={{ color: "red" }}> {item.sender}</span>: {item.text}
                     <span className="d-block" style={{ fontSize: 12 }}>
                         {time}
