@@ -5,9 +5,18 @@
 .dark-foreground {
     background-color: #2f3337 !important;
 }
+
 li.dark-foreground:hover,
 button.dark-foreground:hover,
 .bg-dark:hover,
 a.dark-foreground:hover {
     background-color: #25282c !important;
+}
+
+.text-purple {
+    color: rgb(195, 59, 205) !important;
+}
+
+.text-orange {
+    color: #e95420 !important;
 }
