@@ -32,7 +32,7 @@ export default function Dashboard(props) {
                 </div>
 
                 <div className="col-md-4 bg-dark text-light">
-                    <OnlineStatus />
+                    <OnlineStatus account={props.account} currentRoom={props.getCurrentRoom()}/>
                 </div>
             </div>
         </>
