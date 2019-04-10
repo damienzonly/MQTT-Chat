@@ -12,7 +12,7 @@ class ChatApp extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            account: "user " + Math.floor(Math.random() * 100),
+            account: prompt("What's your name?") || "user " + Math.floor(Math.random() * 1000),
             currentRoom: "global",
             currentMessage: "",
             rooms: {
