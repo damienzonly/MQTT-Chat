@@ -6,6 +6,7 @@
     "aedes": "^0.37.0",
     "mqtt": "^2.18.8",
     "mqtt-react": "0.0.3",
+    "prop-types": "^15.7.2",
     "react": "^16.8.5",
     "react-dom": "^16.8.5",
     "react-scripts": "2.1.8",

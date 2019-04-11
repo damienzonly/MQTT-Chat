@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import PropTypes from "prop-types";
 
 export default class OnlineStatus extends Component {
     render() {
@@ -35,3 +36,9 @@ export default class OnlineStatus extends Component {
         );
     }
 }
+
+OnlineStatus.propTypes = {
+    currentRoom: PropTypes.object,
+    account: PropTypes.string,
+    displayHeight: PropTypes.number
+};

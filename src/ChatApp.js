@@ -261,7 +261,6 @@ class ChatApp extends Component {
                 currentMessage={this.state.currentMessage}
                 onChangeCurrentDraft={this.onChangeCurrentDraft}
                 onSendCurrentDraft={this.onSendCurrentDraft}
-                onTextareaKeyDown={this.onTextareaKeyDown}
                 displayHeight={DASHBOARD_HEIGHT}
             />
         );

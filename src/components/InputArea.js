@@ -1,14 +1,19 @@
 import React from "react";
+import PropTypes from "prop-types";
+
+InputArea.propTypes = {
+    onSendCurrentDraft: PropTypes.func,
+    currentMessage: PropTypes.string
+};
 
 export default function InputArea(props) {
-
     function onCurrentDraftKeyDown(event) {
         if (event.keyCode === 13) {
             if (!event.shiftKey) {
                 props.onSendCurrentDraft(event);
             }
         }
-    };
+    }
     return (
         <div className="container mt-5">
             <div className="form-group">

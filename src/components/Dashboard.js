@@ -3,6 +3,22 @@ import Display from "./Display";
 import Navbar from "./static/Navbar";
 import Sidebar from "./Sidebar";
 import OnlineStatus from "./OnlineStatus";
+import PropTypes from "prop-types";
+
+Dashboard.propTypes = {
+    account: PropTypes.string,
+    rooms: PropTypes.object,
+    openRoom: PropTypes.func,
+    addRoom: PropTypes.func,
+    addMessageToRoom: PropTypes.func,
+    currentRoom: PropTypes.string,
+    getCurrentRoom: PropTypes.func,
+    onTextareaSubmit: PropTypes.func,
+    onChangeCurrentDraft: PropTypes.func,
+    onSendCurrentDraft: PropTypes.func,
+    currentMessage: PropTypes.string,
+    displayHeight: PropTypes.number
+};
 
 export default function Dashboard(props) {
     return (
@@ -28,10 +44,8 @@ export default function Dashboard(props) {
                         account={props.account}
                         currentRoom={props.currentRoom}
                         getCurrentRoom={props.getCurrentRoom}
-                        onTextareaSubmit={props.onTextareaSubmit}
                         onChangeCurrentDraft={props.onChangeCurrentDraft}
                         onSendCurrentDraft={props.onSendCurrentDraft}
-                        onTextareaKeyDown={props.onTextareaKeyDown}
                         currentMessage={props.currentMessage}
                         displayHeight={props.displayHeight}
                     />

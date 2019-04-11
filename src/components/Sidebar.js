@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import PropTypes from "prop-types";
 
 export default class Sidebar extends Component {
     render() {
@@ -9,7 +10,10 @@ export default class Sidebar extends Component {
                 onClick={this.props.openRoom}
                 className="list-group-item btn dark-foreground text-white border border-0 rounded-0"
                 value={item}
-            > {item} </button>
+            >
+                {" "}
+                {item}{" "}
+            </button>
         ));
         return (
             <>
@@ -17,7 +21,11 @@ export default class Sidebar extends Component {
                 <hr className="bg-light m-0 p-0" />
                 <div className="list-group mt-0">
                     {roomsGroup}
-                    <button onClick={this.props.addRoom} type="button" className="btn dark-foreground border border-0 text-light rounded-0">
+                    <button
+                        onClick={this.props.addRoom}
+                        type="button"
+                        className="btn dark-foreground border border-0 text-light rounded-0"
+                    >
                         <i className="fa fa-plus p-3" />
                     </button>
                 </div>
@@ -25,3 +33,9 @@ export default class Sidebar extends Component {
         );
     }
 }
+
+Sidebar.propTypes = {
+    rooms: PropTypes.object,
+    openRoom: PropTypes.func,
+    addRoom: PropTypes.func
+};

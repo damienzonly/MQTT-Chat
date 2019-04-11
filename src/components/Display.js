@@ -1,13 +1,26 @@
 import InputArea from "./InputArea";
 import React from "react";
+import PropTypes from "prop-types";
+
+Display.propTypes = {
+    onSendCurrentDraft: PropTypes.func,
+    currentRoom: PropTypes.string,
+    account: PropTypes.string,
+    currentMessage: PropTypes.string,
+    displayHeight: PropTypes.number,
+};
 
 export default function Display(props) {
     if (props.currentRoom) {
         let room = props.getCurrentRoom();
         let messages = room.messages.map((item, index) => {
-            let leftRight = item.sender === props.account ? "ml-auto" : "mr-auto";
-            let sender = item.sender === props.account ? "" : item.sender + ": ";
-            let time = `${item.time.getHours().pad()}:${item.time.getMinutes().pad()}`;
+            let leftRight =
+                item.sender === props.account ? "ml-auto" : "mr-auto";
+            let sender =
+                item.sender === props.account ? "" : item.sender + ": ";
+            let time = `${item.time
+                .getHours()
+                .pad()}:${item.time.getMinutes().pad()}`;
             return (
                 <div
                     key={index}
@@ -16,7 +29,11 @@ export default function Display(props) {
                         minWidth: 150
                     }}
                 >
-                    <li className={"list-group-item mt-2 border border-circle bg-dark text-light"}>
+                    <li
+                        className={
+                            "list-group-item mt-2 border border-circle bg-dark text-light"
+                        }
+                    >
                         <span className="mb-2" style={{ color: "red" }}>
                             {sender}
                         </span>
@@ -30,7 +47,9 @@ export default function Display(props) {
         });
         return (
             <div className="container">
-                <div className="container mt-3 mb-3">Room: {props.currentRoom.capFirst()}</div>
+                <div className="container mt-3 mb-3">
+                    Room: {props.currentRoom.capFirst()}
+                </div>
                 <div
                     id="messages-list"
                     className="list-group"
@@ -45,11 +64,14 @@ export default function Display(props) {
                 <InputArea
                     onChangeCurrentDraft={props.onChangeCurrentDraft}
                     onSendCurrentDraft={props.onSendCurrentDraft}
-                    onTextareaKeyDown={props.onTextareaKeyDown}
                     currentMessage={props.currentMessage}
                 />
             </div>
         );
     }
-    return <div className="mt-4 text-center">Select one room using the left sidebar</div>;
+    return (
+        <div className="mt-4 text-center">
+            Select one room using the left sidebar
+        </div>
+    );
 }
