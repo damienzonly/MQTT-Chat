@@ -62,9 +62,10 @@ class ChatApp extends Component {
                     for (const member in members) {
                         let last_seen = members[member].last_seen;
                         let now = Date.now();
-                        if (now - last_seen < ONLINE_CHECK_INTERVAL) {
+                        let time_passed = now - last_seen;
+                        if (time_passed < ONLINE_CHECK_INTERVAL) {
                             members[member].online = true;
-                        } else if (now - last_seen > PURGE_INTERVAL) {
+                        } else if (time_passed > PURGE_INTERVAL) {
                             delete members[member];
                         } else {
                             members[member].online = false;
