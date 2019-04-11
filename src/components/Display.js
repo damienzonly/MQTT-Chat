@@ -43,7 +43,8 @@ export default function Display(props) {
                     {messages}
                 </div>
                 <InputArea
-                    onTextareaChange={props.onTextareaChange}
+                    onChangeCurrentDraft={props.onChangeCurrentDraft}
+                    onSendCurrentDraft={props.onSendCurrentDraft}
                     onTextareaKeyDown={props.onTextareaKeyDown}
                     currentMessage={props.currentMessage}
                 />

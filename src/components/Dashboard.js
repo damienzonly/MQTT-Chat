@@ -29,7 +29,8 @@ export default function Dashboard(props) {
                         currentRoom={props.currentRoom}
                         getCurrentRoom={props.getCurrentRoom}
                         onTextareaSubmit={props.onTextareaSubmit}
-                        onTextareaChange={props.onTextareaChange}
+                        onChangeCurrentDraft={props.onChangeCurrentDraft}
+                        onSendCurrentDraft={props.onSendCurrentDraft}
                         onTextareaKeyDown={props.onTextareaKeyDown}
                         currentMessage={props.currentMessage}
                         displayHeight={props.displayHeight}

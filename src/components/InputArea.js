@@ -1,6 +1,14 @@
 import React from "react";
 
 export default function InputArea(props) {
+
+    function onCurrentDraftKeyDown(event) {
+        if (event.keyCode === 13) {
+            if (!event.shiftKey) {
+                props.onSendCurrentDraft(event);
+            }
+        }
+    };
     return (
         <div className="container mt-5">
             <div className="form-group">
@@ -9,8 +17,8 @@ export default function InputArea(props) {
                     placeholder="Type a message..."
                     value={props.currentMessage}
                     className="form-control"
-                    onChange={props.onTextareaChange}
-                    onKeyDown={props.onTextareaKeyDown}
+                    onChange={props.onChangeCurrentDraft}
+                    onKeyDown={onCurrentDraftKeyDown}
                 />
             </div>
         </div>

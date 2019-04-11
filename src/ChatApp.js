@@ -222,7 +222,7 @@ class ChatApp extends Component {
         return this.state.rooms[this.state.currentRoom];
     };
 
-    onTextareaSubmit = event => {
+    onSendCurrentDraft = event => {
         event.preventDefault();
         this.addMessageToRoom({
             sender: this.state.account,
@@ -241,17 +241,10 @@ class ChatApp extends Component {
             });
         });
     };
-    onTextareaChange = event => {
+    onChangeCurrentDraft = event => {
         this.setState({
             currentMessage: event.target.value
         });
-    };
-    onTextareaKeyDown = event => {
-        if (event.keyCode === 13) {
-            if (!event.shiftKey) {
-                this.onTextareaSubmit(event);
-            }
-        }
     };
 
     render() {
@@ -266,7 +259,8 @@ class ChatApp extends Component {
                 getCurrentRoom={this.getCurrentRoom}
                 currentRoomName={this.state.currentRoom}
                 currentMessage={this.state.currentMessage}
-                onTextareaChange={this.onTextareaChange}
+                onChangeCurrentDraft={this.onChangeCurrentDraft}
+                onSendCurrentDraft={this.onSendCurrentDraft}
                 onTextareaKeyDown={this.onTextareaKeyDown}
                 displayHeight={DASHBOARD_HEIGHT}
             />
