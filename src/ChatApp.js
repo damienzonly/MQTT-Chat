@@ -80,26 +80,33 @@ class ChatApp extends Component {
     };
     componentWillMount = () => {
         // initialize mqtt
-        if (process.env.REACT_APP_EXTERNAL_BROKER === 0) {
+        let username =
+            process.env.REACT_APP_USERNAME !== ""
+                ? process.env.REACT_APP_USERNAME
+                : "";
+        let password =
+            process.env.REACT_APP_PASSWORD !== ""
+                ? process.env.REACT_APP_PASSWORD
+                : "";
+
+        let credentials = username && password ? { username, password } : {};
+        let useExternalBroker = Number(process.env.REACT_APP_USE_EXTERNAL_BROKER);
+        let externalBrokerURL = process.env.REACT_APP_EXTERNAL_BROKER_URL;
+        let externalBrokerPort = process.env.REACT_APP_EXTERNAL_BROKER_PORT;
+        let externalBrokerPath = process.env.REACT_APP_EXTERNAL_BROKER_PATH;
+        let internalBrokerURL = process.env.REACT_APP_INTERNAL_BROKER_URL;
+        let internalBrokerPort = process.env.REACT_APP_INTERNAL_BROKER_PORT;
+        if (useExternalBroker) {
             console.debug("Using external broker");
             this.client = mqtt.connect(
-                [
-                    "ws://",
-                    process.env.REACT_APP_EXTERNAL_BROKER_URL,
-                    ":",
-                    process.env.REACT_APP_EXTERNAL_BROKER_PORT,
-                    process.env.REACT_APP_EXTERNAL_BROKER_PATH
-                ].join("")
+                ["ws://", externalBrokerURL, ":", externalBrokerPort, externalBrokerPath].join(""),
+                credentials
             );
         } else {
             console.debug("Using internal broker");
             this.client = mqtt.connect(
-                [
-                    "ws://",
-                    process.env.REACT_APP_INTERNAL_BROKER_URL,
-                    ":",
-                    process.env.REACT_APP_INTERNAL_BROKER_PORT
-                ].join("")
+                ["ws://", internalBrokerURL, ":", internalBrokerPort].join(""),
+                credentials
             );
         }
         this.client
@@ -181,8 +188,8 @@ class ChatApp extends Component {
     };
 
     resetDraft = () => {
-        this.setState({currentMessage: ""})
-    }
+        this.setState({ currentMessage: "" });
+    };
 
     focusTextArea = () => {
         document.getElementById("message-field").focus();
