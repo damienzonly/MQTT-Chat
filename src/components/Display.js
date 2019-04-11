@@ -52,11 +52,10 @@ export default function Display(props) {
                 </div>
                 <div
                     id="messages-list"
-                    className="list-group"
+                    className="list-group overflow-auto"
                     style={{
                         height: props.displayHeight,
-                        maxHeight: props.displayHeight,
-                        overflowY: "scroll"
+                        maxHeight: props.displayHeight
                     }}
                 >
                     {messages}
