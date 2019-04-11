@@ -8,6 +8,24 @@ let PURGE_INTERVAL = 10000;
 let ONLINE_CHECK_INTERVAL = 2000;
 let DASHBOARD_HEIGHT = 500;
 
+let username =
+    process.env.REACT_APP_USERNAME !== ""
+        ? process.env.REACT_APP_USERNAME
+        : "";
+let password =
+    process.env.REACT_APP_PASSWORD !== ""
+        ? process.env.REACT_APP_PASSWORD
+        : "";
+
+let credentials = username && password ? { username, password } : {};
+let useExternalBroker = Number(process.env.REACT_APP_USE_EXTERNAL_BROKER);
+let externalBrokerURL = process.env.REACT_APP_EXTERNAL_BROKER_URL;
+let externalBrokerPort = process.env.REACT_APP_EXTERNAL_BROKER_PORT;
+let externalBrokerPath = process.env.REACT_APP_EXTERNAL_BROKER_PATH;
+let internalBrokerURL = process.env.REACT_APP_INTERNAL_BROKER_URL;
+let internalBrokerPort = process.env.REACT_APP_INTERNAL_BROKER_PORT;
+
+
 class ChatApp extends Component {
     constructor(props) {
         super(props);
@@ -80,22 +98,6 @@ class ChatApp extends Component {
     };
     componentWillMount = () => {
         // initialize mqtt
-        let username =
-            process.env.REACT_APP_USERNAME !== ""
-                ? process.env.REACT_APP_USERNAME
-                : "";
-        let password =
-            process.env.REACT_APP_PASSWORD !== ""
-                ? process.env.REACT_APP_PASSWORD
-                : "";
-
-        let credentials = username && password ? { username, password } : {};
-        let useExternalBroker = Number(process.env.REACT_APP_USE_EXTERNAL_BROKER);
-        let externalBrokerURL = process.env.REACT_APP_EXTERNAL_BROKER_URL;
-        let externalBrokerPort = process.env.REACT_APP_EXTERNAL_BROKER_PORT;
-        let externalBrokerPath = process.env.REACT_APP_EXTERNAL_BROKER_PATH;
-        let internalBrokerURL = process.env.REACT_APP_INTERNAL_BROKER_URL;
-        let internalBrokerPort = process.env.REACT_APP_INTERNAL_BROKER_PORT;
         if (useExternalBroker) {
             console.debug("Using external broker");
             this.client = mqtt.connect(
