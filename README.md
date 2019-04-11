@@ -1,5 +1,7 @@
 ## Open room chat
+Open room chat is an open source self-hosted stateless room chat using mqtt for message transport.
 
+![](pics/open-room-chat.png)
 
 ## Requirements
 - Node v11.12.0+
