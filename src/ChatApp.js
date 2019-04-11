@@ -175,9 +175,14 @@ class ChatApp extends Component {
         this.sendDiscovery(nextRoom);
         setImmediate(() => {
             this.scrollMessagesToBottom();
+            this.resetDraft();
             this.focusTextArea();
         });
     };
+
+    resetDraft = () => {
+        this.setState({currentMessage: ""})
+    }
 
     focusTextArea = () => {
         document.getElementById("message-field").focus();
