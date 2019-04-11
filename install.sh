@@ -1,8 +1,8 @@
 #!/bin/bash
 
 echo "Installing..."
-#npm install
-#npm audit fix
+npm install
+npm audit fix
 
 echo "Edit the .env file and set the broker endponts and credentials..."
 sleep 3
