@@ -1,27 +1,29 @@
-import React, {
-    Component
-} from "react";
+import React, { Component } from "react";
 import Dashboard from "./components/Dashboard";
 
 let mqtt = require("mqtt");
 
-let DISCOVERY_INTERVAL = 1000;
+let DISCOVERY_INTERVAL = 500;
 let PURGE_INTERVAL = 10000;
 let ONLINE_CHECK_INTERVAL = 2000;
+let DASHBOARD_HEIGHT = 500;
+
 class ChatApp extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            account: prompt("What's your name?") || "user " + Math.floor(Math.random() * 1000),
+            account: "user " + Math.floor(Math.random() * 1000),
             currentRoom: "global",
             currentMessage: "",
             rooms: {
                 global: {
-                    messages: [{
-                        text: "Welcome to the IRC chat",
-                        sender: "default-account",
-                        time: new Date()
-                    }],
+                    messages: [
+                        {
+                            text: "Welcome to the IRC chat",
+                            sender: "default-account",
+                            time: new Date()
+                        }
+                    ],
                     members: {}
                 }
             }
@@ -77,12 +79,31 @@ class ChatApp extends Component {
     };
     componentWillMount = () => {
         // initialize mqtt
-        this.client = mqtt.connect("ws://localhost", {
-            port: 8888
-        });
+        if (process.env.REACT_APP_EXTERNAL_BROKER === 0) {
+            console.debug("Using external broker");
+            this.client = mqtt.connect(
+                [
+                    "ws://",
+                    process.env.REACT_APP_EXTERNAL_BROKER_URL,
+                    ":",
+                    process.env.REACT_APP_EXTERNAL_BROKER_PORT,
+                    process.env.REACT_APP_EXTERNAL_BROKER_PATH
+                ].join("")
+            );
+        } else {
+            console.debug("Using internal broker");
+            this.client = mqtt.connect(
+                [
+                    "ws://",
+                    process.env.REACT_APP_INTERNAL_BROKER_URL,
+                    ":",
+                    process.env.REACT_APP_INTERNAL_BROKER_PORT
+                ].join("")
+            );
+        }
         this.client
             .on("connect", () => {
-                console.debug("Client mqtt connected");
+                console.debug("Connected");
                 for (const room of Object.keys(this.state.rooms)) {
                     this.client.subscribe(room);
                     this.client.subscribe(room + "/discovery");
@@ -151,10 +172,10 @@ class ChatApp extends Component {
             currentRoom: nextRoom
         });
         this.sendDiscovery(nextRoom);
-        setTimeout(() => {
+        setImmediate(() => {
             this.scrollMessagesToBottom();
             this.focusTextArea();
-        }, 0);
+        });
     };
 
     focusTextArea = () => {
@@ -168,27 +189,32 @@ class ChatApp extends Component {
 
     addRoom = () => {
         let newRoomName;
-        this.setState(state => {
-            newRoomName = prompt("Enter the new room name");
-            if (!newRoomName) return;
-            if (this.state.rooms.hasOwnProperty(newRoomName)) return;
-            this.client.subscribe(newRoomName);
-            return {
-                rooms: {
-                    ...state.rooms,
-                    [newRoomName]: {
-                        messages: [],
-                        members: {}
+        this.setState(
+            state => {
+                newRoomName = prompt("Enter the new room name");
+                if (!newRoomName) return;
+                if (this.state.rooms.hasOwnProperty(newRoomName)) return;
+                this.client.subscribe(newRoomName);
+                return {
+                    rooms: {
+                        ...state.rooms,
+                        [newRoomName]: {
+                            messages: [],
+                            members: {}
+                        }
                     }
-                }
-            };
-        }, () => {
-            this.openRoom(newRoomName);
-        });
+                };
+            },
+            () => {
+                this.openRoom(newRoomName);
+            }
+        );
     };
 
     getRoom = room => {
-        return this.state.rooms.hasOwnProperty(room) ? this.state.rooms[room] : null;
+        return this.state.rooms.hasOwnProperty(room)
+            ? this.state.rooms[room]
+            : null;
     };
 
     getCurrentRoom = () => {
@@ -228,40 +254,20 @@ class ChatApp extends Component {
     };
 
     render() {
-        return ( <
-            Dashboard account = {
-                this.state.account
-            }
-            rooms = {
-                this.state.rooms
-            }
-            openRoom = {
-                this.openRoom
-            }
-            addRoom = {
-                this.addRoom
-            }
-            addMessageToRoom = {
-                this.addMessageToRoom
-            }
-            currentRoom = {
-                this.state.currentRoom
-            }
-            getCurrentRoom = {
-                this.getCurrentRoom
-            }
-            currentRoomName = {
-                this.state.currentRoom
-            }
-            currentMessage = {
-                this.state.currentMessage
-            }
-            onTextareaChange = {
-                this.onTextareaChange
-            }
-            onTextareaKeyDown = {
-                this.onTextareaKeyDown
-            }
+        return (
+            <Dashboard
+                account={this.state.account}
+                rooms={this.state.rooms}
+                openRoom={this.openRoom}
+                addRoom={this.addRoom}
+                addMessageToRoom={this.addMessageToRoom}
+                currentRoom={this.state.currentRoom}
+                getCurrentRoom={this.getCurrentRoom}
+                currentRoomName={this.state.currentRoom}
+                currentMessage={this.state.currentMessage}
+                onTextareaChange={this.onTextareaChange}
+                onTextareaKeyDown={this.onTextareaKeyDown}
+                displayHeight={DASHBOARD_HEIGHT}
             />
         );
     }

@@ -15,7 +15,11 @@ export default function Dashboard(props) {
 
             <div className="row no-gutters">
                 <div className="col-md-2 dark-foreground text-light">
-                    <Sidebar rooms={props.rooms} openRoom={props.openRoom} addRoom={props.addRoom} />
+                    <Sidebar
+                        rooms={props.rooms}
+                        openRoom={props.openRoom}
+                        addRoom={props.addRoom}
+                    />
                 </div>
 
                 <div className="col-md-6 border dark-foreground border-top-0 border-bottom-0 text-light">
@@ -28,11 +32,16 @@ export default function Dashboard(props) {
                         onTextareaChange={props.onTextareaChange}
                         onTextareaKeyDown={props.onTextareaKeyDown}
                         currentMessage={props.currentMessage}
+                        displayHeight={props.displayHeight}
                     />
                 </div>
 
                 <div className="col-md-4 dark-foreground text-light">
-                    <OnlineStatus account={props.account} currentRoom={props.getCurrentRoom()}/>
+                    <OnlineStatus
+                        displayHeight={props.displayHeight}
+                        account={props.account}
+                        currentRoom={props.getCurrentRoom()}
+                    />
                 </div>
             </div>
         </>

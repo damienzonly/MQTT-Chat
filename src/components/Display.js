@@ -2,7 +2,6 @@ import InputArea from "./InputArea";
 import React from "react";
 
 export default function Display(props) {
-    let displayHeight = 600;
     if (props.currentRoom) {
         let room = props.getCurrentRoom();
         let messages = room.messages.map((item, index) => {
@@ -34,10 +33,10 @@ export default function Display(props) {
                 <div className="container mt-3 mb-3">Room: {props.currentRoom.capFirst()}</div>
                 <div
                     id="messages-list"
-                    className="list-group overflow-auto"
+                    className="list-group"
                     style={{
-                        height: displayHeight,
-                        maxHeight: displayHeight,
+                        height: props.displayHeight,
+                        maxHeight: props.displayHeight,
                         overflowY: "scroll"
                     }}
                 >
