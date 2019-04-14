@@ -6,7 +6,7 @@ import ChangeUsername from "./components/ChangeUsername";
 let mqtt = require("mqtt");
 
 let DISCOVERY_INTERVAL = 500;
-let PURGE_INTERVAL = 10000;
+let PURGE_INTERVAL = 5000;
 let ONLINE_CHECK_INTERVAL = 2000;
 let DASHBOARD_HEIGHT = 500;
 
@@ -146,7 +146,23 @@ class ChatApp extends Component {
                     message = JSON.parse(message);
                     if (topic.match(/\w+\/discovery$/)) {
                         // add new detected user
-                        return this.addMemberToRoom(message, message.room);
+                        if (message.room in this.state.rooms) {
+                            this.addMemberToRoom(message, message.room);
+                        } else {
+                            this.client.subscribe(message.room)
+                            this.setState(state => {
+                                return {
+                                    rooms: {
+                                        ...state.rooms,
+                                        [message.room]: {
+                                            members: {},
+                                            messages: []
+                                        }
+                                    }
+                                };
+                            });
+                        }
+                        return;
                     }
                     if (message.sender === this.state.account) return;
                     this.addMessageToRoom(message, topic);
@@ -191,8 +207,13 @@ class ChatApp extends Component {
         let typeof_e = typeof e !== "string";
         if (typeof_e) e.preventDefault();
         let nextRoom = typeof_e ? e.target.value : e;
+        if (this.state.currentRoom === nextRoom) return;
+        delete this.state.rooms[this.state.currentRoom].members[
+            this.state.account
+        ];
         this.client.subscribe(nextRoom);
         this.setState({
+            ...this.state,
             currentRoom: nextRoom
         });
         this.sendDiscovery(nextRoom);
@@ -241,8 +262,6 @@ class ChatApp extends Component {
     };
 
     getRoom = room => {
-        if (!this.state.rooms.hasOwnProperty(room))
-            throw Error("This room doesn't exist");
         return this.state.rooms.hasOwnProperty(room)
             ? this.state.rooms[room]
             : null;
