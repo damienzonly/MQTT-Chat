@@ -18,13 +18,12 @@ export default class Sidebar extends Component {
         return (
             <>
                 <div className="h2 mt-3 text-light text-center">Rooms</div>
-                <hr className="bg-light m-0 p-0" />
                 <div className="list-group mt-0">
                     {roomsGroup}
                     <button
                         onClick={this.props.addRoom}
                         type="button"
-                        className="btn dark-foreground border border-0 text-light rounded-0"
+                        className="btn dark-foreground text-light rounded-0"
                     >
                         <i className="fa fa-plus p-3" />
                     </button>

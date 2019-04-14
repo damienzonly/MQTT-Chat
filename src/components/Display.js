@@ -7,7 +7,7 @@ Display.propTypes = {
     currentRoom: PropTypes.string,
     account: PropTypes.string,
     currentMessage: PropTypes.string,
-    displayHeight: PropTypes.number,
+    displayHeight: PropTypes.number
 };
 
 export default function Display(props) {
@@ -34,9 +34,7 @@ export default function Display(props) {
                             "list-group-item mt-2 border border-circle bg-dark text-light"
                         }
                     >
-                        <span className="mb-2" style={{ color: "red" }}>
-                            {sender}
-                        </span>
+                        <span className="mb-2 text-purple">{sender}</span>
                         {item.text}
                         <span className="mt-3 d-block" style={{ fontSize: 12 }}>
                             <i className="fa fa-check" /> {time}

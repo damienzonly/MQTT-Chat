@@ -1,5 +1,7 @@
 import React, { Component } from "react";
 import Dashboard from "./components/Dashboard";
+import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
+import ChangeUsername from "./components/ChangeUsername";
 
 let mqtt = require("mqtt");
 
@@ -9,13 +11,9 @@ let ONLINE_CHECK_INTERVAL = 2000;
 let DASHBOARD_HEIGHT = 500;
 
 let username =
-    process.env.REACT_APP_USERNAME !== ""
-        ? process.env.REACT_APP_USERNAME
-        : "";
+    process.env.REACT_APP_USERNAME !== "" ? process.env.REACT_APP_USERNAME : "";
 let password =
-    process.env.REACT_APP_PASSWORD !== ""
-        ? process.env.REACT_APP_PASSWORD
-        : "";
+    process.env.REACT_APP_PASSWORD !== "" ? process.env.REACT_APP_PASSWORD : "";
 
 let credentials = username && password ? { username, password } : {};
 let useExternalBroker = Number(process.env.REACT_APP_USE_EXTERNAL_BROKER);
@@ -71,6 +69,16 @@ class ChatApp extends Component {
         }, this.scrollMessagesToBottom);
     };
 
+    changeAccountName = name => {
+        if (name === "") return;
+        let room = this.getRoom(this.state.currentRoom);
+        if (name in room.members) {
+            console.error(`Username "${name}" already exists`);
+            return;
+        }
+        this.setState({ account: name });
+    };
+
     handleOnlinePeople = () => {
         setInterval(() => {
             this.setState(state => {
@@ -101,7 +109,13 @@ class ChatApp extends Component {
         if (useExternalBroker) {
             console.debug("Using external broker");
             this.client = mqtt.connect(
-                ["ws://", externalBrokerURL, ":", externalBrokerPort, externalBrokerPath].join(""),
+                [
+                    "ws://",
+                    externalBrokerURL,
+                    ":",
+                    externalBrokerPort,
+                    externalBrokerPath
+                ].join(""),
                 credentials
             );
         } else {
@@ -227,6 +241,8 @@ class ChatApp extends Component {
     };
 
     getRoom = room => {
+        if (!this.state.rooms.hasOwnProperty(room))
+            throw Error("This room doesn't exist");
         return this.state.rooms.hasOwnProperty(room)
             ? this.state.rooms[room]
             : null;
@@ -263,20 +279,37 @@ class ChatApp extends Component {
 
     render() {
         return (
-            <Dashboard
-                account={this.state.account}
-                rooms={this.state.rooms}
-                openRoom={this.openRoom}
-                addRoom={this.addRoom}
-                addMessageToRoom={this.addMessageToRoom}
-                currentRoom={this.state.currentRoom}
-                getCurrentRoom={this.getCurrentRoom}
-                currentRoomName={this.state.currentRoom}
-                currentMessage={this.state.currentMessage}
-                onChangeCurrentDraft={this.onChangeCurrentDraft}
-                onSendCurrentDraft={this.onSendCurrentDraft}
-                displayHeight={DASHBOARD_HEIGHT}
-            />
+            <Router>
+                <Switch>
+                    <Route exact path="/">
+                        <Dashboard
+                            account={this.state.account}
+                            rooms={this.state.rooms}
+                            openRoom={this.openRoom}
+                            addRoom={this.addRoom}
+                            addMessageToRoom={this.addMessageToRoom}
+                            currentRoom={this.state.currentRoom}
+                            getCurrentRoom={this.getCurrentRoom}
+                            currentRoomName={this.state.currentRoom}
+                            currentMessage={this.state.currentMessage}
+                            onChangeCurrentDraft={this.onChangeCurrentDraft}
+                            onSendCurrentDraft={this.onSendCurrentDraft}
+                            displayHeight={DASHBOARD_HEIGHT}
+                        />
+                    </Route>
+                    <Route
+                        exact
+                        path="/account-name"
+                        render={p => (
+                            <ChangeUsername
+                                {...p}
+                                account={this.state.account}
+                                changeAccountName={this.changeAccountName}
+                            />
+                        )}
+                    />
+                </Switch>
+            </Router>
         );
     }
 }
