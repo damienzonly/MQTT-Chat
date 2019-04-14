@@ -23,7 +23,6 @@ let externalBrokerPath = process.env.REACT_APP_EXTERNAL_BROKER_PATH;
 let internalBrokerURL = process.env.REACT_APP_INTERNAL_BROKER_URL;
 let internalBrokerPort = process.env.REACT_APP_INTERNAL_BROKER_PORT;
 
-
 class ChatApp extends Component {
     constructor(props) {
         super(props);
@@ -71,6 +70,7 @@ class ChatApp extends Component {
 
     changeAccountName = name => {
         if (name === "") return;
+        if (name === this.state.account) return;
         let room = this.getRoom(this.state.currentRoom);
         if (name in room.members) {
             console.error(`Username "${name}" already exists`);
@@ -149,7 +149,7 @@ class ChatApp extends Component {
                         if (message.room in this.state.rooms) {
                             this.addMemberToRoom(message, message.room);
                         } else {
-                            this.client.subscribe(message.room)
+                            this.client.subscribe(message.room);
                             this.setState(state => {
                                 return {
                                     rooms: {

@@ -1,11 +1,13 @@
 import React, { Component } from "react";
 import Navbar from "./static/Navbar";
+import { Redirect } from "react-router-dom";
 
 export default class ChangeUsername extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            draftUsername: ""
+            draftUsername: "",
+            redirect: false
         };
     }
     onDraftUsernameChange = e => {
@@ -17,9 +19,18 @@ export default class ChangeUsername extends Component {
         document.getElementById("change-account-name").focus();
     };
 
+    setRedirect = bool => {
+        this.setState({ redirect: bool });
+    };
+
+    redirect = () => {
+        if (this.state.redirect) return <Redirect to="/" />;
+    };
+
     render() {
         return (
             <>
+                {this.redirect()}
                 <Navbar account={this.props.account} />
                 <div className="row no-gutters mt-4 h-100 text-light">
                     <div className="col-md-4 p-4 offset-md-4 dark-foreground ">
@@ -34,6 +45,7 @@ export default class ChangeUsername extends Component {
                                     this.state.draftUsername
                                 );
                                 this.setState({ draftUsername: "" });
+                                this.setRedirect(true);
                             }}
                         >
                             <input
