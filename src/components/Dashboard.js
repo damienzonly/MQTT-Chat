@@ -14,8 +14,8 @@ Dashboard.propTypes = {
     currentRoom: PropTypes.string,
     getCurrentRoom: PropTypes.func,
     onTextareaSubmit: PropTypes.func,
-    onChangeCurrentDraft: PropTypes.func,
-    onSendCurrentDraft: PropTypes.func,
+    changeDraft: PropTypes.func,
+    sendDraft: PropTypes.func,
     currentMessage: PropTypes.string,
     displayHeight: PropTypes.number
 };
@@ -44,8 +44,8 @@ export default function Dashboard(props) {
                         account={props.account}
                         currentRoom={props.currentRoom}
                         getCurrentRoom={props.getCurrentRoom}
-                        onChangeCurrentDraft={props.onChangeCurrentDraft}
-                        onSendCurrentDraft={props.onSendCurrentDraft}
+                        changeDraft={props.changeDraft}
+                        sendDraft={props.sendDraft}
                         currentMessage={props.currentMessage}
                         displayHeight={props.displayHeight}
                     />

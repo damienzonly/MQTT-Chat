@@ -7,7 +7,9 @@ export default class Sidebar extends Component {
             <button
                 type="button"
                 key={index}
-                onClick={this.props.openRoom}
+                onClick={event => {
+                    this.props.openRoom(event.target.value)
+                }}
                 className="list-group-item btn dark-foreground text-white border border-0 rounded-0"
                 value={item}
             >

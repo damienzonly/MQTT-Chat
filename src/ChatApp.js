@@ -145,7 +145,7 @@ class ChatApp extends Component {
                 try {
                     message = JSON.parse(message);
                     if (topic.match(/\w+\/discovery$/)) {
-                        // add new detected user
+                        // create room and add user
                         if (message.room in this.state.rooms) {
                             this.addMemberToRoom(message, message.room);
                         } else {
@@ -202,11 +202,8 @@ class ChatApp extends Component {
         });
     };
 
-    openRoom = e => {
-        if (!e) return;
-        let typeof_e = typeof e !== "string";
-        if (typeof_e) e.preventDefault();
-        let nextRoom = typeof_e ? e.target.value : e;
+    openRoom = nextRoom => {
+        if (!nextRoom) return;
         if (this.state.currentRoom === nextRoom) return;
         delete this.state.rooms[this.state.currentRoom].members[
             this.state.account
@@ -271,8 +268,7 @@ class ChatApp extends Component {
         return this.state.rooms[this.state.currentRoom];
     };
 
-    onSendCurrentDraft = event => {
-        event.preventDefault();
+    sendDraft = () => {
         this.addMessageToRoom({
             sender: this.state.account,
             text: this.state.currentMessage
@@ -290,9 +286,9 @@ class ChatApp extends Component {
             });
         });
     };
-    onChangeCurrentDraft = event => {
+    changeDraft = draft => {
         this.setState({
-            currentMessage: event.target.value
+            currentMessage: draft
         });
     };
 
@@ -311,8 +307,8 @@ class ChatApp extends Component {
                             getCurrentRoom={this.getCurrentRoom}
                             currentRoomName={this.state.currentRoom}
                             currentMessage={this.state.currentMessage}
-                            onChangeCurrentDraft={this.onChangeCurrentDraft}
-                            onSendCurrentDraft={this.onSendCurrentDraft}
+                            changeDraft={this.changeDraft}
+                            sendDraft={this.sendDraft}
                             displayHeight={DASHBOARD_HEIGHT}
                         />
                     </Route>

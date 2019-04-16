@@ -2,7 +2,7 @@ import React from "react";
 import PropTypes from "prop-types";
 
 InputArea.propTypes = {
-    onSendCurrentDraft: PropTypes.func,
+    sendDraft: PropTypes.func,
     currentMessage: PropTypes.string
 };
 
@@ -10,7 +10,7 @@ export default function InputArea(props) {
     function onCurrentDraftKeyDown(event) {
         if (event.keyCode === 13) {
             if (!event.shiftKey) {
-                props.onSendCurrentDraft(event);
+                props.sendDraft(event);
             }
         }
     }
@@ -22,7 +22,10 @@ export default function InputArea(props) {
                     placeholder="Type a message..."
                     value={props.currentMessage}
                     className="form-control"
-                    onChange={props.onChangeCurrentDraft}
+                    onChange={event => {
+                        event.preventDefault();
+                        props.changeDraft(event.target.value)
+                    }}
                     onKeyDown={onCurrentDraftKeyDown}
                 />
             </div>

@@ -3,7 +3,7 @@ import React from "react";
 import PropTypes from "prop-types";
 
 Display.propTypes = {
-    onSendCurrentDraft: PropTypes.func,
+    sendDraft: PropTypes.func,
     currentRoom: PropTypes.string,
     account: PropTypes.string,
     currentMessage: PropTypes.string,
@@ -59,8 +59,8 @@ export default function Display(props) {
                     {messages}
                 </div>
                 <InputArea
-                    onChangeCurrentDraft={props.onChangeCurrentDraft}
-                    onSendCurrentDraft={props.onSendCurrentDraft}
+                    changeDraft={props.changeDraft}
+                    sendDraft={props.sendDraft}
                     currentMessage={props.currentMessage}
                 />
             </div>
