@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import Dashboard from "./components/Dashboard";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import ChangeUsername from "./components/ChangeUsername";
+import _ from "lodash";
 
 let mqtt = require("mqtt");
 
@@ -41,7 +42,8 @@ class ChatApp extends Component {
                     ],
                     members: {}
                 }
-            }
+            },
+            discoveries: {}
         };
         this.handleOnlinePeople();
     }
@@ -49,8 +51,9 @@ class ChatApp extends Component {
     addMessageToRoom = (message, room) => {
         if (message.text === "") return;
         this.setState(state => {
-            room = room || state.currentRoom;
-            let nextRoom = state.rooms[room];
+            // clone currentRoom instead of reference
+            room = room || `${state.currentRoom}`;
+            let nextRoom = this.getRoomClone(room);
             nextRoom.messages = [
                 ...nextRoom.messages,
                 {
@@ -71,7 +74,7 @@ class ChatApp extends Component {
     changeAccountName = name => {
         if (name === "") return;
         if (name === this.state.account) return;
-        let room = this.getRoom(this.state.currentRoom);
+        let room = this.getRoomClone(this.state.currentRoom);
         if (name in room.members) {
             console.error(`Username "${name}" already exists`);
             return;
@@ -82,7 +85,7 @@ class ChatApp extends Component {
     handleOnlinePeople = () => {
         setInterval(() => {
             this.setState(state => {
-                let rooms = state.rooms;
+                let rooms = _.cloneDeep(state.rooms);
                 for (const room in rooms) {
                     let members = rooms[room].members;
                     for (const member in members) {
@@ -132,10 +135,8 @@ class ChatApp extends Component {
                     this.client.subscribe(room);
                     this.client.subscribe(room + "/discovery");
                     console.debug("subscribed to", room);
-                    console.debug("subscribed to", room + "/discovery");
-                    setInterval(() => {
-                        this.sendDiscovery(room);
-                    }, DISCOVERY_INTERVAL);
+                    console.debug("subscribed to", room + "/discovery");            
+                    this.sendDiscovery(room, DISCOVERY_INTERVAL);
                 }
             })
             .on("error", err => {
@@ -147,8 +148,11 @@ class ChatApp extends Component {
                     if (topic.match(/\w+\/discovery$/)) {
                         // create room and add user
                         if (message.room in this.state.rooms) {
+                            // TODO
+                            // new member connected, update my members list
                             this.addMemberToRoom(message, message.room);
                         } else {
+                            // someone else is spamming into another room
                             this.client.subscribe(message.room);
                             this.setState(state => {
                                 return {
@@ -172,25 +176,35 @@ class ChatApp extends Component {
             });
     };
 
-    sendDiscovery = room => {
-        this.client.publish(
-            room + "/discovery",
-            JSON.stringify({
-                account: this.state.account,
-                room: this.state.currentRoom,
-                last_seen: Date.now(),
-                online: true
+    sendDiscovery = (room, interval) => {
+        let intv = setInterval(() => {            
+            this.client.publish(
+                room + "/discovery",
+                JSON.stringify({
+                    account: this.state.account,
+                    room: this.state.currentRoom,
+                    last_seen: Date.now(),
+                    online: true
+                })
+            );
+            this.setState(state => {
+                return {
+                    discoveries: {
+                        ...state.discoveries,
+                        [room]: intv
+                    }
+                }
             })
-        );
+        }, interval);
     };
 
-    addMemberToRoom = (member, room) => {
-        let nextRoom = this.getRoom(room);
+    addMemberToRoom = (payload, room) => {
+        let nextRoom = this.getRoomClone(room);
         let roomMembers = Object.keys(nextRoom.members);
-        if (roomMembers.indexOf(member) !== -1) return;
+        if (roomMembers.indexOf(payload) !== -1) return;
         nextRoom.members = {
             ...nextRoom.members,
-            [member.account]: member
+            [payload.account]: payload
         };
         this.setState(state => {
             return {
@@ -205,15 +219,20 @@ class ChatApp extends Component {
     openRoom = nextRoom => {
         if (!nextRoom) return;
         if (this.state.currentRoom === nextRoom) return;
-        delete this.state.rooms[this.state.currentRoom].members[
-            this.state.account
-        ];
         this.client.subscribe(nextRoom);
-        this.setState({
-            ...this.state,
-            currentRoom: nextRoom
+        this.setState(state => {
+            clearInterval(this.state.discoveries[state.currentRoom])
+            let room = this.getRoomClone(state.currentRoom);
+            let discoveries = {...state.discoveries}
+            delete discoveries[state.currentRoom]
+            delete room.members[state.account];
+            return {
+                ...state,
+                currentRoom: nextRoom,
+                discoveries
+            };
         });
-        this.sendDiscovery(nextRoom);
+        this.sendDiscovery(nextRoom, DISCOVERY_INTERVAL);
         setImmediate(() => {
             this.scrollMessagesToBottom();
             this.resetDraft();
@@ -234,18 +253,16 @@ class ChatApp extends Component {
         g.scrollTop = g.scrollHeight;
     };
 
-    addRoom = () => {
-        let newRoomName;
+    addRoom = room => {
         this.setState(
             state => {
-                newRoomName = prompt("Enter the new room name");
-                if (!newRoomName) return;
-                if (this.state.rooms.hasOwnProperty(newRoomName)) return;
-                this.client.subscribe(newRoomName);
+                if (!room) return;
+                if (this.state.rooms.hasOwnProperty(room)) return;
+                this.client.subscribe(room);
                 return {
                     rooms: {
                         ...state.rooms,
-                        [newRoomName]: {
+                        [room]: {
                             messages: [],
                             members: {}
                         }
@@ -253,19 +270,19 @@ class ChatApp extends Component {
                 };
             },
             () => {
-                this.openRoom(newRoomName);
+                this.openRoom(room);
             }
         );
     };
 
-    getRoom = room => {
+    getRoomClone = room => {
         return this.state.rooms.hasOwnProperty(room)
-            ? this.state.rooms[room]
+            ? _.cloneDeep(this.state.rooms[room])
             : null;
     };
 
     getCurrentRoom = () => {
-        return this.state.rooms[this.state.currentRoom];
+        return _.cloneDeep(this.state.rooms[this.state.currentRoom]);
     };
 
     sendDraft = () => {
