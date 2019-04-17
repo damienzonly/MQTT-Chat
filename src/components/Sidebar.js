@@ -8,7 +8,7 @@ export default class Sidebar extends Component {
                 type="button"
                 key={index}
                 onClick={event => {
-                    this.props.openRoom(event.target.value)
+                    this.props.openRoom(event.target.value);
                 }}
                 className="list-group-item btn dark-foreground text-white border border-0 rounded-0"
                 value={item}
@@ -23,7 +23,11 @@ export default class Sidebar extends Component {
                 <div className="list-group mt-0">
                     {roomsGroup}
                     <button
-                        onClick={this.props.addRoom}
+                        onClick={e => {
+                            e.preventDefault();
+                            let newRoom = prompt("Enter the new room name");
+                            this.props.addRoom(newRoom);
+                        }}
                         type="button"
                         className="btn dark-foreground text-light rounded-0"
                     >
