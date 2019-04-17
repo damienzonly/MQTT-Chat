@@ -6,23 +6,21 @@ import _ from "lodash";
 
 let mqtt = require("mqtt");
 
-let DISCOVERY_INTERVAL = 500;
-let PURGE_INTERVAL = 5000;
-let ONLINE_CHECK_INTERVAL = 2000;
-let DASHBOARD_HEIGHT = 500;
+const DISCOVERY_INTERVAL = 500;
+const PURGE_INTERVAL = 5000;
+const ONLINE_CHECK_INTERVAL = 2000;
+const DASHBOARD_HEIGHT = 500;
 
-let username =
-    process.env.REACT_APP_USERNAME !== "" ? process.env.REACT_APP_USERNAME : "";
-let password =
-    process.env.REACT_APP_PASSWORD !== "" ? process.env.REACT_APP_PASSWORD : "";
+const username = process.env.REACT_APP_USERNAME || "";
+const password = process.env.REACT_APP_PASSWORD || "";
 
-let credentials = username && password ? { username, password } : {};
-let useExternalBroker = Number(process.env.REACT_APP_USE_EXTERNAL_BROKER);
-let externalBrokerURL = process.env.REACT_APP_EXTERNAL_BROKER_URL;
-let externalBrokerPort = process.env.REACT_APP_EXTERNAL_BROKER_PORT;
-let externalBrokerPath = process.env.REACT_APP_EXTERNAL_BROKER_PATH;
-let internalBrokerURL = process.env.REACT_APP_INTERNAL_BROKER_URL;
-let internalBrokerPort = process.env.REACT_APP_INTERNAL_BROKER_PORT;
+const credentials = username && password ? { username, password } : {};
+const useExternalBroker = Number(process.env.REACT_APP_USE_EXTERNAL_BROKER);
+const externalBrokerURL = process.env.REACT_APP_EXTERNAL_BROKER_URL;
+const externalBrokerPort = process.env.REACT_APP_EXTERNAL_BROKER_PORT;
+const externalBrokerPath = process.env.REACT_APP_EXTERNAL_BROKER_PATH;
+const internalBrokerURL = process.env.REACT_APP_INTERNAL_BROKER_URL;
+const internalBrokerPort = process.env.REACT_APP_INTERNAL_BROKER_PORT;
 
 class ChatApp extends Component {
     constructor(props) {
@@ -42,9 +40,9 @@ class ChatApp extends Component {
                     ],
                     members: {}
                 }
-            },
-            discoveries: {}
+            }
         };
+        this.discoveries = {};
         this.handleOnlinePeople();
     }
 
@@ -177,7 +175,7 @@ class ChatApp extends Component {
     };
 
     sendDiscovery = (room, interval) => {
-        let intv = setInterval(() => {            
+        let intv = setInterval(() => {   
             this.client.publish(
                 room + "/discovery",
                 JSON.stringify({
@@ -187,14 +185,10 @@ class ChatApp extends Component {
                     online: true
                 })
             );
-            this.setState(state => {
-                return {
-                    discoveries: {
-                        ...state.discoveries,
-                        [room]: intv
-                    }
-                }
-            })
+            this.discoveries = {
+                ...this.discoveries,
+                [room]: intv
+            }
         }, interval);
     };
 
@@ -221,15 +215,13 @@ class ChatApp extends Component {
         if (this.state.currentRoom === nextRoom) return;
         this.client.subscribe(nextRoom);
         this.setState(state => {
-            clearInterval(this.state.discoveries[state.currentRoom])
+            clearInterval(this.discoveries[state.currentRoom])
             let room = this.getRoomClone(state.currentRoom);
-            let discoveries = {...state.discoveries}
-            delete discoveries[state.currentRoom]
+            delete this.discoveries[state.currentRoom]
             delete room.members[state.account];
             return {
                 ...state,
-                currentRoom: nextRoom,
-                discoveries
+                currentRoom: nextRoom
             };
         });
         this.sendDiscovery(nextRoom, DISCOVERY_INTERVAL);
