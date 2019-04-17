@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "aedes": "^0.37.0",
+    "lodash": "^4.17.11",
     "mqtt": "^2.18.8",
     "mqtt-react": "0.0.3",
     "prop-types": "^15.7.2",
