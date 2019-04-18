@@ -7,9 +7,10 @@ import _ from "lodash";
 let mqtt = require("mqtt");
 
 const DISCOVERY_INTERVAL = 500;
-const PURGE_INTERVAL = 5000;
 const ONLINE_CHECK_INTERVAL = 2000;
+const PURGE_INTERVAL = 5000;
 const DASHBOARD_HEIGHT = 500;
+const HANDLE_PEOPLE_FN_INTERVAL = 1000;
 
 const username = process.env.REACT_APP_USERNAME || "";
 const password = process.env.REACT_APP_PASSWORD || "";
@@ -43,7 +44,7 @@ class ChatApp extends Component {
     }
 
     addMessageToRoom = (message, room) => {
-        if (message.text.match(/^\s+$/)) return;
+        if (message.text.match(/^\s*$/)) return;
         message.text = message.text.trim();
         this.setState(state => {
             // clone currentRoom instead of reference
@@ -104,7 +105,7 @@ class ChatApp extends Component {
                     rooms
                 };
             });
-        }, 2000);
+        }, HANDLE_PEOPLE_FN_INTERVAL);
     };
     componentWillMount = () => {
         // initialize mqtt
@@ -196,25 +197,37 @@ class ChatApp extends Component {
         });
     };
 
-    openRoom = nextRoom => {
-        if (!nextRoom) return;
-        if (this.state.currentRoom === nextRoom) {
+    openRoom = nextRoomName => {
+        if (!nextRoomName) return;
+        if (this.state.currentRoom === nextRoomName) {
             this.scrollMessagesToBottom();
             this.focusTextArea();
             return;
         }
-        this.tuneToRoom(nextRoom);
+        this.tuneToRoom(nextRoomName);
         this.setState(state => {
             clearInterval(this.discoveries[state.currentRoom]);
             let room = this.getRoomClone(state.currentRoom);
+            let nextRoom = this.getRoomClone(nextRoomName);
+            if (!nextRoom) return;
+            if (nextRoom.members.hasOwnProperty(state.account)) {
+                console.error("A user named", state.account, "");
+                return {};
+            }
             delete this.discoveries[state.currentRoom];
             delete room.members[state.account];
             return {
-                ...state,
-                currentRoom: nextRoom
+                rooms: {
+                    ...state.rooms,
+                    // remove immediately myself from the current room
+                    [state.currentRoom]: room,
+                    // update the room i'm entering in
+                    [nextRoomName]: nextRoom
+                },
+                currentRoom: nextRoomName
             };
         });
-        this.sendDiscovery(nextRoom, DISCOVERY_INTERVAL);
+        this.sendDiscovery(nextRoomName, DISCOVERY_INTERVAL);
         setImmediate(() => {
             this.scrollMessagesToBottom();
             this.resetDraft();
@@ -266,7 +279,7 @@ class ChatApp extends Component {
      * you SHOULD NOT prepend "room/" before this parameter
      */
     getRoomClone = room => (this.state.rooms.hasOwnProperty(room) ? _.cloneDeep(this.state.rooms[room]) : null);
-    
+
     getCurrentRoom = () => {
         return _.cloneDeep(this.state.rooms[this.state.currentRoom]);
     };
