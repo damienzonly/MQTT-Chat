@@ -16,11 +16,11 @@ const password = process.env.REACT_APP_PASSWORD || "";
 
 const credentials = username && password ? { username, password } : {};
 const useExternalBroker = Number(process.env.REACT_APP_USE_EXTERNAL_BROKER);
-const externalBrokerURL = process.env.REACT_APP_EXTERNAL_BROKER_URL;
-const externalBrokerPort = process.env.REACT_APP_EXTERNAL_BROKER_PORT;
-const externalBrokerPath = process.env.REACT_APP_EXTERNAL_BROKER_PATH;
-const internalBrokerURL = process.env.REACT_APP_INTERNAL_BROKER_URL;
-const internalBrokerPort = process.env.REACT_APP_INTERNAL_BROKER_PORT;
+const externalBrokerURL = process.env.REACT_APP_EXTERNAL_BROKER_URL || "";
+const externalBrokerPort = process.env.REACT_APP_EXTERNAL_BROKER_PORT || "";
+const externalBrokerPath = process.env.REACT_APP_EXTERNAL_BROKER_PATH || "";
+const internalBrokerURL = process.env.REACT_APP_INTERNAL_BROKER_URL || "";
+const internalBrokerPort = process.env.REACT_APP_INTERNAL_BROKER_PORT || "";
 
 class ChatApp extends Component {
     constructor(props) {
@@ -43,11 +43,11 @@ class ChatApp extends Component {
             }
         };
         this.discoveries = {};
-        this.handleOnlinePeople();
     }
 
     addMessageToRoom = (message, room) => {
-        if (message.text === "") return;
+        if (message.text.match(/^\s+$/)) return;
+        message.text = message.text.trim();
         this.setState(state => {
             // clone currentRoom instead of reference
             room = room || `${state.currentRoom}`;
@@ -110,53 +110,45 @@ class ChatApp extends Component {
         if (useExternalBroker) {
             console.debug("Using external broker");
             this.client = mqtt.connect(
-                [
-                    "ws://",
-                    externalBrokerURL,
-                    ":",
-                    externalBrokerPort,
-                    externalBrokerPath
-                ].join(""),
+                "ws://" + externalBrokerURL + ":" + externalBrokerPort + externalBrokerPath,
                 credentials
             );
         } else {
             console.debug("Using internal broker");
-            this.client = mqtt.connect(
-                ["ws://", internalBrokerURL, ":", internalBrokerPort].join(""),
-                credentials
-            );
+            this.client = mqtt.connect("ws://" + internalBrokerURL + ":" + internalBrokerPort, credentials);
         }
         this.client
             .on("connect", () => {
                 console.debug("Connected");
                 for (const room of Object.keys(this.state.rooms)) {
                     this.client.subscribe(room);
-                    this.client.subscribe(room + "/discovery");
+                    this.client.subscribe("+/discovery");
                     console.debug("subscribed to", room);
-                    console.debug("subscribed to", room + "/discovery");            
+                    console.debug("subscribed to", room + "/discovery");
                     this.sendDiscovery(room, DISCOVERY_INTERVAL);
                 }
             })
             .on("error", err => {
                 if (err) console.error(err);
             })
-            .on("message", (topic, message) => {
+            .on("message", (topic, packet) => {
                 try {
-                    message = JSON.parse(message);
+                    packet = JSON.parse(packet);
                     if (topic.match(/\w+\/discovery$/)) {
                         // create room and add user
-                        if (message.room in this.state.rooms) {
+                        if (packet.room in this.state.rooms) {
                             // TODO
+                            // check topic name instead of packet when migrating room topics to room/+
                             // new member connected, update my members list
-                            this.addMemberToRoom(message, message.room);
+                            this.addMemberToRoom(packet, packet.room);
                         } else {
                             // someone else is spamming into another room
-                            this.client.subscribe(message.room);
+                            this.client.subscribe(packet.room);
                             this.setState(state => {
                                 return {
                                     rooms: {
                                         ...state.rooms,
-                                        [message.room]: {
+                                        [packet.room]: {
                                             members: {},
                                             messages: []
                                         }
@@ -166,8 +158,8 @@ class ChatApp extends Component {
                         }
                         return;
                     }
-                    if (message.sender === this.state.account) return;
-                    this.addMessageToRoom(message, topic);
+                    if (packet.sender === this.state.account) return;
+                    this.addMessageToRoom(packet, topic);
                 } catch (e) {
                     console.error(e);
                 }
@@ -175,7 +167,7 @@ class ChatApp extends Component {
     };
 
     sendDiscovery = (room, interval) => {
-        let intv = setInterval(() => {   
+        let intv = setInterval(() => {
             this.client.publish(
                 room + "/discovery",
                 JSON.stringify({
@@ -188,7 +180,7 @@ class ChatApp extends Component {
             this.discoveries = {
                 ...this.discoveries,
                 [room]: intv
-            }
+            };
         }, interval);
     };
 
@@ -212,12 +204,17 @@ class ChatApp extends Component {
 
     openRoom = nextRoom => {
         if (!nextRoom) return;
-        if (this.state.currentRoom === nextRoom) return;
+        if (this.state.currentRoom === nextRoom) {
+            this.scrollMessagesToBottom();
+            this.focusTextArea();
+            return;
+        }
         this.client.subscribe(nextRoom);
+        this.client.subscribe(nextRoom + "/discovery");
         this.setState(state => {
-            clearInterval(this.discoveries[state.currentRoom])
+            clearInterval(this.discoveries[state.currentRoom]);
             let room = this.getRoomClone(state.currentRoom);
-            delete this.discoveries[state.currentRoom]
+            delete this.discoveries[state.currentRoom];
             delete room.members[state.account];
             return {
                 ...state,
@@ -268,9 +265,7 @@ class ChatApp extends Component {
     };
 
     getRoomClone = room => {
-        return this.state.rooms.hasOwnProperty(room)
-            ? _.cloneDeep(this.state.rooms[room])
-            : null;
+        return this.state.rooms.hasOwnProperty(room) ? _.cloneDeep(this.state.rooms[room]) : null;
     };
 
     getCurrentRoom = () => {
