@@ -49,6 +49,10 @@ class ChatApp extends Component {
             // clone currentRoom instead of reference
             room = room || `${state.currentRoom}`;
             let nextRoom = this.getRoomClone(room);
+            if (!nextRoom) {
+                console.error("couldn't not find room", room);
+                return;
+            }
             nextRoom.messages = [
                 ...nextRoom.messages,
                 {
@@ -113,10 +117,8 @@ class ChatApp extends Component {
             .on("connect", () => {
                 console.debug("Connected");
                 for (const room of Object.keys(this.state.rooms)) {
-                    this.client.subscribe(room);
-                    this.client.subscribe("+/discovery");
-                    console.debug("subscribed to", room);
-                    console.debug("subscribed to", room + "/discovery");
+                    this.tuneToRoom(room);
+                    console.log(`tuned to room/${room}`);
                     this.sendDiscovery(room, DISCOVERY_INTERVAL);
                 }
             })
@@ -135,7 +137,7 @@ class ChatApp extends Component {
                             this.addMemberToRoom(packet, packet.room);
                         } else {
                             // someone else is spamming into another room
-                            this.client.subscribe(packet.room);
+                            this.tuneToRoom(packet.room);
                             this.setState(state => {
                                 return {
                                     rooms: {
@@ -151,18 +153,19 @@ class ChatApp extends Component {
                         return;
                     }
                     if (packet.sender === this.state.account) return;
-                    this.addMessageToRoom(packet, topic);
+                    this.addMessageToRoom(packet, topic.substr("room/".length));
                 } catch (e) {
                     console.error(e);
                 }
             });
+        this.client.subscribe(`room/+/discovery`);
         this.handleOnlinePeople();
     };
 
     sendDiscovery = (room, interval) => {
         let intv = setInterval(() => {
             this.client.publish(
-                room + "/discovery",
+                `room/${room}/discovery`,
                 JSON.stringify({
                     account: this.state.account,
                     room: this.state.currentRoom,
@@ -202,8 +205,7 @@ class ChatApp extends Component {
             this.focusTextArea();
             return;
         }
-        this.client.subscribe(nextRoom);
-        this.client.subscribe(nextRoom + "/discovery");
+        this.tuneToRoom(nextRoom);
         this.setState(state => {
             clearInterval(this.discoveries[state.currentRoom]);
             let room = this.getRoomClone(state.currentRoom);
@@ -235,12 +237,16 @@ class ChatApp extends Component {
         g.scrollTop = g.scrollHeight;
     };
 
+    tuneToRoom = room => {
+        this.client.subscribe(`room/${room}`);
+    };
+
     addRoom = room => {
         this.setState(
             state => {
                 if (!room) return;
                 if (this.state.rooms.hasOwnProperty(room)) return;
-                this.client.subscribe(room);
+                this.tuneToRoom(room);
                 return {
                     rooms: {
                         ...state.rooms,
@@ -257,10 +263,12 @@ class ChatApp extends Component {
         );
     };
 
-    getRoomClone = room => {
-        return this.state.rooms.hasOwnProperty(room) ? _.cloneDeep(this.state.rooms[room]) : null;
-    };
-
+    /**
+     * Returns the room associated with "room"
+     * you SHOULD NOT prepend "room/" before this parameter
+     */
+    getRoomClone = room => (this.state.rooms.hasOwnProperty(room) ? _.cloneDeep(this.state.rooms[room]) : null);
+    
     getCurrentRoom = () => {
         return _.cloneDeep(this.state.rooms[this.state.currentRoom]);
     };
@@ -272,7 +280,7 @@ class ChatApp extends Component {
         });
         setImmediate(() => {
             this.client.publish(
-                this.state.currentRoom,
+                `room/${this.state.currentRoom}`,
                 JSON.stringify({
                     sender: this.state.account,
                     text: this.state.currentMessage
@@ -299,7 +307,6 @@ class ChatApp extends Component {
                             rooms={this.state.rooms}
                             openRoom={this.openRoom}
                             addRoom={this.addRoom}
-                            addMessageToRoom={this.addMessageToRoom}
                             currentRoom={this.state.currentRoom}
                             getCurrentRoom={this.getCurrentRoom}
                             currentRoomName={this.state.currentRoom}
