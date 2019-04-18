@@ -253,6 +253,10 @@ class ChatApp extends Component {
     };
 
     addRoom = room => {
+        if (room.match(/\s+/)) {
+            console.error("room names must not contain whitespaces");
+            return;
+        }
         this.setState(
             state => {
                 if (!room) return;
