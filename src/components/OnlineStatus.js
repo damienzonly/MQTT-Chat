@@ -11,7 +11,7 @@ export default class OnlineStatus extends Component {
                     return (
                         <li
                             key={index}
-                            className="list-group-item border-0 bg-dark text-light"
+                            className="list-group-item border-0 rounded-0 bg-dark text-light"
                         >
                             <i className={"fa fa-circle " + cls} />{" "}
                             {member.account}
@@ -24,7 +24,7 @@ export default class OnlineStatus extends Component {
             <>
                 <div className="p-1 h3 text-center">Online status</div>
                 <div
-                    className="list-group overflow-auto"
+                    className="list-group rounded-0 overflow-auto"
                     style={{
                         minHeight: this.props.displayHeight + 150,
                         maxHeight: this.props.displayHeight + 150
