@@ -131,8 +131,6 @@ class ChatApp extends Component {
                     if (topic.match(/\w+\/discovery$/)) {
                         // create room and add user
                         if (packet.room in this.state.rooms) {
-                            // TODO
-                            // check topic name instead of packet when migrating room topics to room/+
                             // new member connected, update my members list
                             this.addMemberToRoom(packet, packet.room);
                         } else {
