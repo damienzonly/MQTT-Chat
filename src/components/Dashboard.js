@@ -40,7 +40,6 @@ export default function Dashboard(props) {
 
                 <div className="col-md-6 dark-foreground text-light">
                     <Display
-                        addMessageToRoom={props.addMessageToRoom}
                         account={props.account}
                         currentRoom={props.currentRoom}
                         getCurrentRoom={props.getCurrentRoom}
