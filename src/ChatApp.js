@@ -15,12 +15,9 @@ const username = process.env.REACT_APP_USERNAME || "";
 const password = process.env.REACT_APP_PASSWORD || "";
 
 const credentials = username && password ? { username, password } : {};
-const useExternalBroker = Number(process.env.REACT_APP_USE_EXTERNAL_BROKER);
-const externalBrokerURL = process.env.REACT_APP_EXTERNAL_BROKER_URL || "";
-const externalBrokerPort = process.env.REACT_APP_EXTERNAL_BROKER_PORT || "";
-const externalBrokerPath = process.env.REACT_APP_EXTERNAL_BROKER_PATH || "";
-const internalBrokerURL = process.env.REACT_APP_INTERNAL_BROKER_URL || "";
-const internalBrokerPort = process.env.REACT_APP_INTERNAL_BROKER_PORT || "";
+const brokerUrl = process.env.REACT_APP_BROKER_URL || "";
+const brokerPort = process.env.REACT_APP_BROKER_PORT || "";
+const brokerPath = process.env.REACT_APP_BROKER_PATH || "";
 
 class ChatApp extends Component {
     constructor(props) {
@@ -107,16 +104,11 @@ class ChatApp extends Component {
     };
     componentWillMount = () => {
         // initialize mqtt
-        if (useExternalBroker) {
-            console.debug("Using external broker");
-            this.client = mqtt.connect(
-                "ws://" + externalBrokerURL + ":" + externalBrokerPort + externalBrokerPath,
-                credentials
-            );
-        } else {
-            console.debug("Using internal broker");
-            this.client = mqtt.connect("ws://" + internalBrokerURL + ":" + internalBrokerPort, credentials);
-        }
+        this.client = mqtt.connect("ws://" + brokerUrl, {
+            port: brokerPort,
+            path: brokerPath,
+            ...credentials
+        });
         this.client
             .on("connect", () => {
                 console.debug("Connected");
@@ -164,6 +156,7 @@ class ChatApp extends Component {
                     console.error(e);
                 }
             });
+        this.handleOnlinePeople();
     };
 
     sendDiscovery = (room, interval) => {
